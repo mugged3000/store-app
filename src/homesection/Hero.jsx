@@ -8,7 +8,7 @@ import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 const SLIDES = [
   {
     id: 1,
-    label: "Summer Collection '26",
+    label: "Textured Short Sleeve Shirt",
     heading: "Designed\nTo Stand Out.",
     sub: "Elevated essentials. Timeless fits.\nCrafted for comfort. Made for everyone.",
     mainSrc:  "/images/t-shirt1.png",
@@ -17,7 +17,7 @@ const SLIDES = [
   },
   {
     id: 2,
-    label: "Summer Collection '26",
+    label: "Relaxed Fit Brown T-Shirt",
     heading: "Designed\nTo Stand Out.",
     sub: "Elevated essentials. Timeless fits.\nCrafted for comfort. Made for everyone.",
     mainSrc:  "/images/t-shirt2.png",
@@ -26,7 +26,7 @@ const SLIDES = [
   },
   {
     id: 3,
-    label: "Summer Collection '26",
+    label: "Striped Button-Up Shirt",
     heading: "Refined.\nUnrestrained.",
     sub: "Premium streetwear built for\neveryday movement.",
     mainSrc:  "/images/t-shirt3.png",
@@ -35,7 +35,7 @@ const SLIDES = [
   },
   {
     id: 4,
-    label: "Accessories Edit",
+    label: "Elegant Button Midi Dress",
     heading: "The Details\nMatter Most.",
     sub: "Curated accessories to complete\nany look, any occasion.",
     mainSrc:  "/images/t-babe1.png",
@@ -44,16 +44,16 @@ const SLIDES = [
   },
   {
     id: 5,
-    label: "Headwear Drop",
+    label: "Floral Fitted Midi Dress",
     heading: "Top It\nAll Off.",
-    sub: "Caps and hats designed for\nthe modern minimalist.",
+    sub: "Bags and hats designed for\nthe modern minimalist.",
     mainSrc:  "/images/t-babe2.png",
     mainAlt:  "Look 5 – Classic Cap",
     thumbSrc: "/images/t-babe2.png",
   },
   {
     id: 6,
-    label: "New Arrivals",
+    label: "Neutral Outfit Set",
     heading: "Minimal.\nMaximal Impact.",
     sub: "Clean silhouettes. Quality materials.\nLasting style.",
     mainSrc:  "/images/t-babe3.png",

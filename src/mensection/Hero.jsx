@@ -7,9 +7,7 @@ import { gsap } from "gsap";
 import { ArrowRight, ChevronDown } from "lucide-react";
 
 // 💡 Replace these with your real men's hero image paths in /public/images/
-const HERO_IMG  = "/images/menset1.png";   // main full-bleed photo
-const HERO_IMG2 = "/images/t-shirt1.png";  // accent/inset image (right panel)
-const HERO_IMG3 = "/images/t-shirt2.png";  // second accent
+const HERO_IMG  = "/images/menhero.png";   // main full-bleed photo
 
 const STATS = [
   { value: "180+", label: "Men's Styles" },
@@ -202,28 +200,7 @@ export default function MenHero() {
           className="hidden lg:flex flex-col gap-3 shrink-0 self-center"
           style={{ opacity: 0 }}
         >
-          {/* Tall main card */}
-          {/* 💡 Replace HERO_IMG2 with your men's editorial photo */}
-          <div className="relative w-[220px] xl:w-[260px] h-[320px] xl:h-[380px] overflow-hidden bg-[#1a1814]">
-            <Image src={HERO_IMG2} alt="Men look 1" fill className="object-cover object-top transition-transform duration-700 hover:scale-[1.04]" sizes="280px" />
-            <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 60%)" }} />
-            <div className="absolute bottom-4 left-4">
-              <p className="text-white text-[12px] font-semibold tracking-wider uppercase mb-0.5">Essential Hoodie</p>
-              <p className="text-[#C9A84C] text-[11px] font-bold">$89.00</p>
-            </div>
-            <div className="absolute top-3 left-3 px-2 py-1 bg-[#C9A84C] text-[#1a1000] text-[8px] font-bold tracking-[0.1em] uppercase">NEW</div>
-          </div>
-
-          {/* Second smaller card */}
-          {/* 💡 Replace HERO_IMG3 with your second men's product photo */}
-          <div className="relative w-[220px] xl:w-[260px] h-[180px] xl:h-[210px] overflow-hidden bg-[#1a1814]">
-            <Image src={HERO_IMG3} alt="Men look 2" fill className="object-cover object-top transition-transform duration-700 hover:scale-[1.04]" sizes="280px" />
-            <div className="absolute inset-0" style={{ background: "linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 60%)" }} />
-            <div className="absolute bottom-4 left-4">
-              <p className="text-white text-[12px] font-semibold tracking-wider uppercase mb-0.5">Relaxed Sweatshirt</p>
-              <p className="text-[#C9A84C] text-[11px] font-bold">$69.00</p>
-            </div>
-          </div>
+         
         </div>
 
       </div>

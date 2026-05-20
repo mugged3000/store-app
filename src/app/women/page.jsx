@@ -1,10 +1,11 @@
 
-import Women from "@/womensection/Hero"
+import WomenHero from "@/womensection/Hero";
 import WomenProducts from "@/womensection/Womenproduct";
-export default function Men() {
+
+export default function Women() {
   return (
     <main>
-      <Women />
+      <WomenHero />
       <WomenProducts />
     </main>
   );

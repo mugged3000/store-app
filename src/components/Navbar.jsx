@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { gsap } from "gsap";
+import { usePathname } from "next/navigation";
 import { Search, User, Heart, ShoppingBag, X, Menu, ChevronRight } from "lucide-react";
 
 const NAV_LINKS = [
@@ -27,8 +28,10 @@ export default function Navbar() {
   const [scrolled,   setScrolled]   = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [activeLink, setActiveLink] = useState(null);
   const [cartCount]                 = useState(2);
+
+
+  const pathname = usePathname();
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -101,16 +104,16 @@ export default function Navbar() {
               <li key={label} className="relative flex items-start gap-[3px]">
                 <Link href={href}
                   ref={(el) => (linksRef.current[i] = el)}
-                  onClick={() => setActiveLink(label)}
+                 
                   onMouseEnter={(e) => lift(e.currentTarget)}
                   onMouseLeave={(e) => drop(e.currentTarget)}
                   style={{ fontFamily: "var(--font-syne)", opacity: 0 }}
                   className={["relative text-[11px] font-semibold tracking-[0.09em] uppercase group transition-colors duration-200",
-                    sale ? "text-[#C9A84C] hover:text-[#dfc070]" : activeLink === label ? "text-white" : "text-white/55 hover:text-white",
+                    sale ? "text-[#C9A84C] hover:text-[#dfc070]" : pathname === href ? "text-white" : "text-white/55 hover:text-white",
                   ].join(" ")}>
                   {label}
                   <span className={["absolute -bottom-[2px] left-0 h-[0.5px] bg-white/70 transition-[width] duration-300 ease-out",
-                    activeLink === label ? "w-full" : "w-0 group-hover:w-full"].join(" ")} />
+                    pathname === href ? "w-full" : "w-0 group-hover:w-full"].join(" ")} />
                 </Link>
                 {badge && (
                   <span style={{ fontFamily: "var(--font-syne)" }}
