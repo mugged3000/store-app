@@ -3,7 +3,7 @@
 
 import ContactHero from "@/contact/Hero";
 import ContactMain from "@/contact/Main";
-export default function Men() {
+export default function Contact() {
   return (
     <main>
       <ContactHero />

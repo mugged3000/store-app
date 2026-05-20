@@ -1,6 +1,6 @@
 
 import Uniseex from "@/unisexsection/Unisex";
-export default function Men() {
+export default function Shop() {
   return (
     <main>
       <Uniseex />

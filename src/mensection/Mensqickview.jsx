@@ -23,7 +23,7 @@ function getThumbnails(product) {
   return [product.src, a, b];
 }
 
-export function WomenQuickView({ product, onClose, isFav, onToggleFav }) {
+export function MenQuickView({ product, onClose, isFav, onToggleFav }) {
   const overlayRef = useRef(null);
   const panelRef   = useRef(null);
   const heartRef   = useRef(null);

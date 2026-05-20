@@ -5,9 +5,9 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SlidersHorizontal, ChevronDown, ChevronLeft, ChevronRight, X } from "lucide-react";
 
-import { ALL_PRODUCTS, SORT_OPTIONS, PER_PAGE } from "@/womensection/womendata";
-import ProductCard from "@/womensection/Womenproductcard";
-import MenFilterSidebar from "@/womensection/Womensfillter";
+import { ALL_PRODUCTS, SORT_OPTIONS, PER_PAGE } from "@/mensection/mensdata";
+import ProductCard from "@/mensection/Mensproductcard";
+import MenFilterSidebar from "@/mensection/Mensfillter";
 
 gsap.registerPlugin(ScrollTrigger);
 

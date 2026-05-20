@@ -17,9 +17,9 @@ const PRODUCTS = [
     badge: "NEW",
     src: "/images/t-shirt1.png",
     thumbnails: [
-      "/images/t-shirt1.png",
-      "/images/t-shirt2.png",
-      "/images/t-shirt3.png",
+      "/images/tum-shirt1.png",
+      "/images/tum-shirt2.png",
+      "/images/tum-shirt3.png",
     ],
   },
   {
@@ -29,9 +29,9 @@ const PRODUCTS = [
     badge: "NEW",
     src: "/images/t-shirt2.png",
     thumbnails: [
-      "/images/t-shirt2.png",
-      "/images/t-shirt1.png",
-      "/images/t-shirt3.png",
+      "/images/tom-shirt1.png",
+      "/images/tom-shirt2.png",
+      "/images/tom-shirt3.png",
     ],
   },
   {
@@ -41,9 +41,9 @@ const PRODUCTS = [
     badge: "NEW",
     src: "/images/t-shirt3.png",
     thumbnails: [
-      "/images/t-shirt3.png",
-      "/images/t-shirt1.png",
-      "/images/t-shirt2.png",
+      "/images/ziptum-shirt1.png",
+      "/images/ziptum-shirt2.png",
+      "/images/ziptum-shirt3.png",
     ],
   },
   {
@@ -53,9 +53,9 @@ const PRODUCTS = [
     badge: "NEW",
     src: "/images/t-babe1.png",
     thumbnails: [
-      "/images/t-babe1.png",
-      "/images/t-babe2.png",
-      "/images/t-babe3.png",
+      "/images/tum-babe1.png",
+      "/images/tum-babe2.png",
+      "/images/tum-babe3.png",
     ],
   },
   {
@@ -65,9 +65,9 @@ const PRODUCTS = [
     badge: "NEW",
     src: "/images/t-babe2.png",
     thumbnails: [
-      "/images/t-babe2.png",
-      "/images/t-babe1.png",
-      "/images/t-babe3.png",
+      "/images/tom-babe1.png",
+      "/images/tom-babe2.png",
+      "/images/tom-babe3.png",
     ],
   },
   {
@@ -77,9 +77,9 @@ const PRODUCTS = [
     badge: "NEW",
     src: "/images/t-babe3.png",
     thumbnails: [
-      "/images/t-babe3.png",
-      "/images/t-babe1.png",
-      "/images/t-babe2.png",
+      "/images/set-babe1.png",
+      "/images/set-babe2.png",
+      "/images/set-babe3.png",
     ],
   },
 ];

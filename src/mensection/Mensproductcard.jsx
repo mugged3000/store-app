@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import Image from "next/image";
 import { gsap } from "gsap";
 import { Heart, ShoppingBag, Star } from "lucide-react";
-import { WomenQuickView } from "./Womenquickview";
+import { MenQuickView } from "./Mensqickview";
 
 export default function ProductCard({ product, isFav, onToggleFav }) {
   const heartRef = useRef(null);
@@ -109,7 +109,7 @@ export default function ProductCard({ product, isFav, onToggleFav }) {
 
       {/* Modal — portaled to body */}
       {modalOpen && (
-        <WomenQuickView
+        <MenQuickView
           product={product}
           onClose={() => setModalOpen(false)}
           isFav={isFav}

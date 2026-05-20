@@ -1,7 +1,8 @@
+import LayoutWrapper from "@/components/Wrapper";
 import { Syne, Playfair_Display } from "next/font/google";
+
 import "./globals.css";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+
 const syne = Syne({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
@@ -23,11 +24,16 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${syne.variable} ${playfair.variable}`}>
+    <html
+      lang="en"
+      className={`${syne.variable} ${playfair.variable}`}
+    >
       <body className="bg-[#0a0a0a]">
-        <Navbar />
-        {children}
-        <Footer />
+
+        <LayoutWrapper>
+          {children}
+        </LayoutWrapper>
+
       </body>
     </html>
   );
