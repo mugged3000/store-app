@@ -190,6 +190,10 @@ const config = {
         "fromEnvVar": null,
         "value": "windows",
         "native": true
+      },
+      {
+        "fromEnvVar": null,
+        "value": "rhel-openssl-3.0.x"
       }
     ],
     "previewFeatures": [],
@@ -216,8 +220,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider = \"prisma-client-js\"\n  output   = \"./generated\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel Admin {\n  id       String @id @default(cuid())\n  email    String @unique\n  password String\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n\nmodel Product {\n  id String @id @default(cuid())\n\n  name        String\n  description String?\n  price       Float\n\n  image        String\n  images       String[]\n  gender       Gender?\n  isNewArrival Boolean  @default(false)\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n\nmodel Contact {\n  id String @id @default(cuid())\n\n  name    String\n  email   String\n  message String\n\n  createdAt DateTime @default(now())\n}\n\nmodel HeroSlide {\n  id          String  @id @default(cuid())\n  title       String\n  subTitle    String\n  description String?\n  isActive    Boolean @default(true)\n\n  images HeroImage[]\n\n  createdAt DateTime @default(now())\n}\n\nmodel HeroImage {\n  id  String @id @default(cuid())\n  url String\n\n  isMain Boolean @default(false)\n  order  Int     @default(0)\n\n  heroSlideId String\n  heroSlide   HeroSlide @relation(fields: [heroSlideId], references: [id], onDelete: Cascade)\n\n  createdAt DateTime @default(now())\n}\n\nenum Gender {\n  men\n  women\n  shop\n}\n",
-  "inlineSchemaHash": "5ab7a2d3764e3baff293468c981e207a492d194e89786375a6eb2967df4cb6a2",
+  "inlineSchema": "// This is your Prisma schema file,\n// learn more about it in the docs: https://pris.ly/d/prisma-schema\n\n// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?\n// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init\n\ngenerator client {\n  provider      = \"prisma-client-js\"\n  binaryTargets = [\"native\", \"rhel-openssl-3.0.x\"]\n  output        = \"./generated\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel Admin {\n  id       String @id @default(cuid())\n  email    String @unique\n  password String\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n\nmodel Product {\n  id String @id @default(cuid())\n\n  name        String\n  description String?\n  price       Float\n\n  image        String\n  images       String[]\n  gender       Gender?\n  isNewArrival Boolean  @default(false)\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n\nmodel Contact {\n  id String @id @default(cuid())\n\n  name    String\n  email   String\n  message String\n\n  createdAt DateTime @default(now())\n}\n\nmodel HeroSlide {\n  id          String  @id @default(cuid())\n  title       String\n  subTitle    String\n  description String?\n  isActive    Boolean @default(true)\n\n  images HeroImage[]\n\n  createdAt DateTime @default(now())\n}\n\nmodel HeroImage {\n  id  String @id @default(cuid())\n  url String\n\n  isMain Boolean @default(false)\n  order  Int     @default(0)\n\n  heroSlideId String\n  heroSlide   HeroSlide @relation(fields: [heroSlideId], references: [id], onDelete: Cascade)\n\n  createdAt DateTime @default(now())\n}\n\nenum Gender {\n  men\n  women\n  shop\n}\n",
+  "inlineSchemaHash": "70fb62fce8d06ebc6d2d811d7e27a206633e313cbb3b2818c465f8b496bded37",
   "copyEngine": true
 }
 
@@ -258,6 +262,10 @@ Object.assign(exports, Prisma)
 // file annotations for bundling tools to include these files
 path.join(__dirname, "query_engine-windows.dll.node");
 path.join(process.cwd(), "db/generated/query_engine-windows.dll.node")
+
+// file annotations for bundling tools to include these files
+path.join(__dirname, "libquery_engine-rhel-openssl-3.0.x.so.node");
+path.join(process.cwd(), "db/generated/libquery_engine-rhel-openssl-3.0.x.so.node")
 // file annotations for bundling tools to include these files
 path.join(__dirname, "schema.prisma");
 path.join(process.cwd(), "db/generated/schema.prisma")
