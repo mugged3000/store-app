@@ -95,7 +95,7 @@ export default function Navbar() {
 
           <Link href="/" ref={logoRef} style={{ fontFamily: "var(--font-syne)", opacity: 0 }}
             className="text-white font-bold tracking-[0.2em] text-[14px] uppercase select-none shrink-0 leading-none z-10">
-            NEXORA
+            ROWAN STORE
           </Link>
 
           {/* Centered desktop links */}

@@ -9,81 +9,6 @@ import { Heart, ShoppingBag, ArrowRight, ChevronLeft, ChevronRight, X } from "lu
 
 gsap.registerPlugin(ScrollTrigger);
 
-const PRODUCTS = [
-  {
-    id: 1,
-    name: "Textured Short Sleeve Shirt",
-    price: 89,
-    badge: "NEW",
-    src: "/images/t-shirt1.png",
-    thumbnails: [
-      "/images/tum-shirt1.png",
-      "/images/tum-shirt2.png",
-      "/images/tum-shirt3.png",
-    ],
-  },
-  {
-    id: 2,
-    name: "Relaxed Fit Brown T-Shirt",
-    price: 69,
-    badge: "NEW",
-    src: "/images/t-shirt2.png",
-    thumbnails: [
-      "/images/tom-shirt1.png",
-      "/images/tom-shirt2.png",
-      "/images/tom-shirt3.png",
-    ],
-  },
-  {
-    id: 3,
-    name: "Striped Button-Up Shirt",
-    price: 49,
-    badge: "NEW",
-    src: "/images/t-shirt3.png",
-    thumbnails: [
-      "/images/ziptum-shirt1.png",
-      "/images/ziptum-shirt2.png",
-      "/images/ziptum-shirt3.png",
-    ],
-  },
-  {
-    id: 4,
-    name: "Elegant Button Midi Dress",
-    price: 39,
-    badge: "NEW",
-    src: "/images/t-babe1.png",
-    thumbnails: [
-      "/images/tum-babe1.png",
-      "/images/tum-babe2.png",
-      "/images/tum-babe3.png",
-    ],
-  },
-  {
-    id: 5,
-    name: "Floral Fitted Midi Dress",
-    price: 29,
-    badge: "NEW",
-    src: "/images/t-babe2.png",
-    thumbnails: [
-      "/images/tom-babe1.png",
-      "/images/tom-babe2.png",
-      "/images/tom-babe3.png",
-    ],
-  },
-  {
-    id: 6,
-    name: "Neutral Outfit Set",
-    price: 79,
-    badge: "NEW",
-    src: "/images/t-babe3.png",
-    thumbnails: [
-      "/images/set-babe1.png",
-      "/images/set-babe2.png",
-      "/images/set-babe3.png",
-    ],
-  },
-];
-
 // ─── PRODUCT MODAL ─────────────────────────────────────────────────────────────
 function ProductModal({ product, onClose, isFav, onToggleFav }) {
   const [activeThumb, setActiveThumb] = useState(0);
@@ -137,7 +62,7 @@ function ProductModal({ product, onClose, isFav, onToggleFav }) {
         {/* Main image */}
         <div className="relative w-full sm:w-[55%] aspect-[3/4] sm:aspect-auto bg-[#181614] shrink-0">
           <Image
-            src={product.thumbnails[activeThumb]}
+            src={product.images[activeThumb]}
             alt={product.name}
             fill
             className="object-cover object-center"
@@ -167,7 +92,9 @@ function ProductModal({ product, onClose, isFav, onToggleFav }) {
               </h3>
               <p className="text-[#C9A84C] text-[15px] font-semibold mt-1"
                 style={{ fontFamily: "var(--font-syne)" }}>
-                ${product.price}.00
+               <p className="text-[#C9A84C] text-[15px] font-semibold mt-1">
+                 ${(Number(product.price) / 100).toFixed(2)}
+                </p>
               </p>
             </div>
 
@@ -196,7 +123,7 @@ function ProductModal({ product, onClose, isFav, onToggleFav }) {
               Designs
             </p>
             <div className="flex gap-2 flex-wrap">
-              {product.thumbnails.map((thumb, idx) => (
+              {product.images.map((thumb, idx) => (
                 <button
                   key={idx}
                   onClick={() => setActiveThumb(idx)}
@@ -255,13 +182,13 @@ function ProductCard({ product, index, onOpenModal, isFav, onToggleFav }) {
   return (
     <div
       ref={cardRef}
-      className="group relative flex flex-col bg-[#111010] overflow-hidden cursor-pointer"
+      className="group relative flex flex-col bg-[#111010] overflow-hidden cursor-pointer rounded-xl"
       onClick={() => onOpenModal(product)}
     >
       {/* Image wrapper */}
-      <div className="relative block aspect-[3/4] overflow-hidden bg-[#181614]">
+      <div className="relative block aspect-[3/4] overflow-hidden bg-[#181614] rounded-t-xl">
         <Image
-          src={product.src}
+          src={product.image}
           alt={product.name}
           fill
           className="object-cover object-center transition-transform duration-700 group-hover:scale-[1.04]"
@@ -272,14 +199,14 @@ function ProductCard({ product, index, onOpenModal, isFav, onToggleFav }) {
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
 
         {/* Badge */}
-        {product.badge && (
-          <span
-            className="absolute top-3 left-3 z-10 px-2 py-1 text-[#1a1000] text-[9px] font-bold tracking-[0.12em] uppercase bg-[#C9A84C] leading-none"
-            style={{ fontFamily: "var(--font-syne)" }}
-          >
-            {product.badge}
-          </span>
-        )}
+        {(product.badge || product.isNewArrival) && (
+  <span
+    className="absolute top-3 left-3 z-10 px-2 py-1 text-[#1a1000] text-[9px] font-bold tracking-[0.12em] uppercase bg-[#C9A84C] leading-none"
+    style={{ fontFamily: "var(--font-syne)" }}
+  >
+    {product.badge || "New"}
+  </span>
+)}
 
         {/* Favourite button */}
         <button
@@ -318,8 +245,21 @@ function ProductCard({ product, index, onOpenModal, isFav, onToggleFav }) {
           className="text-white/55 text-[12px] font-medium"
           style={{ fontFamily: "var(--font-syne)" }}
         >
-          ${product.price}.00
+         ${(Number(product.price) / 100).toFixed(2)}
         </p>
+      </div>
+    </div>
+  );
+}
+
+// ─── SKELETON CARD ─────────────────────────────────────────────────────────────
+function SkeletonCard() {
+  return (
+    <div className="flex flex-col bg-[#111010] overflow-hidden animate-pulse">
+      <div className="aspect-[3/4] bg-[#1e1c1c]" />
+      <div className="px-3 pt-3 pb-4 flex flex-col gap-2">
+        <div className="h-3 w-3/4 bg-[#1e1c1c] rounded" />
+        <div className="h-3 w-1/3 bg-[#1e1c1c] rounded" />
       </div>
     </div>
   );
@@ -332,10 +272,41 @@ export default function NewArrivals() {
   const cardsRef   = useRef([]);
   const sliderRef  = useRef(null);
 
+  const [products,       setProducts]       = useState([]);
+  const [loading,        setLoading]        = useState(true);
+  const [error,          setError]          = useState(null);
   const [canScrollLeft,  setCanScrollLeft]  = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
   const [modalProduct,   setModalProduct]   = useState(null);
   const [favourites,     setFavourites]     = useState(new Set());
+
+  // ── Fetch products from your API route ──────────────────────────────────────
+  useEffect(() => {
+    async function fetchProducts() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const res = await fetch("/api/products?type=new-arrivals", {
+        cache: "no-store",
+      });
+
+        if (!res.ok) throw new Error(`Failed to load products (${res.status})`);
+
+        const data = await res.json();
+
+        // Normalise: support both { products: [...] } and a plain array response
+        setProducts(Array.isArray(data) ? data : (data.products ?? []));
+      } catch (err) {
+        console.error("[NewArrivals] fetch error:", err);
+        setError(err.message || "Something went wrong. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchProducts();
+  }, []);
 
   const toggleFav = (id) => {
     setFavourites((prev) => {
@@ -345,7 +316,10 @@ export default function NewArrivals() {
     });
   };
 
+  // ── GSAP scroll animations — run once products are rendered ─────────────────
   useEffect(() => {
+    if (loading || products.length === 0) return;
+
     const ctx = gsap.context(() => {
       gsap.fromTo(headingRef.current,
         { opacity: 0, y: 24 },
@@ -362,8 +336,9 @@ export default function NewArrivals() {
         }
       );
     }, sectionRef);
+
     return () => ctx.revert();
-  }, []);
+  }, [loading, products]);
 
   const updateScroll = useCallback(() => {
     const el = sliderRef.current;
@@ -378,7 +353,7 @@ export default function NewArrivals() {
     el.addEventListener("scroll", updateScroll, { passive: true });
     updateScroll();
     return () => el.removeEventListener("scroll", updateScroll);
-  }, [updateScroll]);
+  }, [updateScroll, products]);
 
   const scroll = (dir) => {
     const el = sliderRef.current;
@@ -388,6 +363,9 @@ export default function NewArrivals() {
       behavior: "smooth",
     });
   };
+
+  // ── Skeleton placeholder count while loading ─────────────────────────────────
+  const SKELETON_COUNT = 5;
 
   return (
     <section
@@ -454,6 +432,18 @@ export default function NewArrivals() {
           </div>
         </div>
 
+        {/* Error state */}
+        {error && (
+          <div className="px-5 sm:px-8 lg:px-14 mb-6">
+            <p
+              className="text-white/40 text-[12px] tracking-wide"
+              style={{ fontFamily: "var(--font-syne)" }}
+            >
+              {error}
+            </p>
+          </div>
+        )}
+
         {/* Scroll rail */}
         <div
           ref={sliderRef}
@@ -462,7 +452,18 @@ export default function NewArrivals() {
         >
           <style>{`div::-webkit-scrollbar { display: none; }`}</style>
 
-          {PRODUCTS.map((product, idx) => (
+          {/* Loading skeletons */}
+          {loading && Array.from({ length: SKELETON_COUNT }).map((_, i) => (
+            <div
+              key={`skeleton-${i}`}
+              className="flex-none w-[calc(50vw-28px)] sm:w-[calc(33vw-28px)] lg:w-[calc(20vw-20px)] min-w-[170px] max-w-[260px]"
+            >
+              <SkeletonCard />
+            </div>
+          ))}
+
+          {/* Populated cards */}
+          {!loading && products.map((product, idx) => (
             <div
               key={product.id}
               ref={(el) => (cardsRef.current[idx] = el)}

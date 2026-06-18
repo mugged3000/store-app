@@ -5,63 +5,6 @@ import Image from "next/image";
 import { gsap } from "gsap";
 import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 
-const SLIDES = [
-  {
-    id: 1,
-    label: "Textured Short Sleeve Shirt",
-    heading: "Designed\nTo Stand Out.",
-    sub: "Elevated essentials. Timeless fits.\nCrafted for comfort. Made for everyone.",
-    mainSrc:  "/images/t-shirt1.png",
-    mainAlt:  "Look 1 – Essential Hoodie",
-    thumbSrc: "/images/t-shirt1.png",
-  },
-  {
-    id: 2,
-    label: "Relaxed Fit Brown T-Shirt",
-    heading: "Designed\nTo Stand Out.",
-    sub: "Elevated essentials. Timeless fits.\nCrafted for comfort. Made for everyone.",
-    mainSrc:  "/images/t-shirt2.png",
-    mainAlt:  "Look 2 – Relaxed Sweatshirt",
-    thumbSrc: "/images/t-shirt2.png",
-  },
-  {
-    id: 3,
-    label: "Striped Button-Up Shirt",
-    heading: "Refined.\nUnrestrained.",
-    sub: "Premium streetwear built for\neveryday movement.",
-    mainSrc:  "/images/t-shirt3.png",
-    mainAlt:  "Look 3 – Heavyweight Tee",
-    thumbSrc: "/images/t-shirt3.png",
-  },
-  {
-    id: 4,
-    label: "Elegant Button Midi Dress",
-    heading: "The Details\nMatter Most.",
-    sub: "Curated accessories to complete\nany look, any occasion.",
-    mainSrc:  "/images/t-babe1.png",
-    mainAlt:  "Look 4 – Canvas Tote",
-    thumbSrc: "/images/t-babe1.png",
-  },
-  {
-    id: 5,
-    label: "Floral Fitted Midi Dress",
-    heading: "Top It\nAll Off.",
-    sub: "Bags and hats designed for\nthe modern minimalist.",
-    mainSrc:  "/images/t-babe2.png",
-    mainAlt:  "Look 5 – Classic Cap",
-    thumbSrc: "/images/t-babe2.png",
-  },
-  {
-    id: 6,
-    label: "Neutral Outfit Set",
-    heading: "Minimal.\nMaximal Impact.",
-    sub: "Clean silhouettes. Quality materials.\nLasting style.",
-    mainSrc:  "/images/t-babe3.png",
-    mainAlt:  "Look 6 – Minimal Hoodie",
-    thumbSrc: "/images/t-babe3.png",
-  },
-];
-
 const TRUST_BASE = [
   { title: "Free Shipping",   sub: "On all orders over $150"       },
   { title: "Easy Returns",    sub: "30-day return policy"           },
@@ -71,7 +14,25 @@ const TRUST_BASE = [
 ];
 const TRUST_ITEMS = [...TRUST_BASE, ...TRUST_BASE];
 
+// Maps a HeroSlide DB record (with its images[]) into the shape this component renders.
+// images are pre-sorted by `order` from the API, so images[0] is always the main image.
+function mapSlide(slide) {
+  const images = slide.images ?? [];
+  return {
+    id: slide.id,
+    label: slide.subTitle,
+    heading: slide.title,
+    sub: slide.description ?? "",
+    mainSrc: images[0]?.url ?? null,
+    mainAlt: slide.title,
+    thumbSrc: images[0]?.url ?? null,
+    images, // full gallery for the thumbnail rail
+  };
+}
+
 export default function HeroSection() {
+  const [slides,    setSlides]    = useState([]);
+  const [loading,   setLoading]   = useState(true);
   const [active,    setActive]    = useState(0);
   const [animating, setAnimating] = useState(false);
 
@@ -82,8 +43,29 @@ export default function HeroSection() {
   const tickerRef  = useRef(null);
   const thumbsRef  = useRef([]);
 
-  // ── Entrance animation ──────────────────────────────────────────────────
+  // ── Fetch active hero slides from the DB ────────────────────────────────
   useEffect(() => {
+    async function fetchSlides() {
+      try {
+        setLoading(true);
+        const res = await fetch("/api/heroslide?active=true", { cache: "no-store" });
+        const data = await res.json();
+        const mapped = (data.slides ?? []).map(mapSlide).filter((s) => s.mainSrc);
+        setSlides(mapped);
+      } catch (err) {
+        console.error("[HeroSection] fetch error:", err);
+        setSlides([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchSlides();
+  }, []);
+
+  // ── Entrance animation — runs once slides are loaded ────────────────────
+  useEffect(() => {
+    if (loading || slides.length === 0) return;
+
     const ctx = gsap.context(() => {
       gsap.timeline({ defaults: { ease: "power3.out" } })
         .fromTo(lightRef.current,
@@ -100,7 +82,7 @@ export default function HeroSection() {
           { opacity: 1, x: 0, duration: 0.38, stagger: 0.065 }, 0.52);
     }, sectionRef);
     return () => ctx.revert();
-  }, []);
+  }, [loading, slides]);
 
   // ── Light ray breathe ───────────────────────────────────────────────────
   useEffect(() => {
@@ -138,19 +120,71 @@ export default function HeroSection() {
     });
   }, [animating, active]);
 
-  const goNext = () => goTo((active + 1) % SLIDES.length);
-  const goPrev = () => goTo((active - 1 + SLIDES.length) % SLIDES.length);
+  const goNext = useCallback(() => {
+    if (slides.length === 0) return;
+    goTo((active + 1) % slides.length);
+  }, [active, slides.length, goTo]);
 
- // ── Auto-slide (mobile only) ────────────────────────────────────────────
-useEffect(() => {
-  if (window.innerWidth >= 768) return;
-  const timer = setInterval(() => {
-    goNext();
-  }, 4000);
-  return () => clearInterval(timer);
-}, [active, animating]);
+  const goPrev = () => {
+    if (slides.length === 0) return;
+    goTo((active - 1 + slides.length) % slides.length);
+  };
 
-  const slide = SLIDES[active];
+  // ── Auto-slide (mobile only) ────────────────────────────────────────────
+  useEffect(() => {
+    if (typeof window === "undefined" || window.innerWidth >= 768) return;
+    if (slides.length < 2) return;
+    const timer = setInterval(() => {
+      goNext();
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [active, animating, slides.length, goNext]);
+
+  // Clamp active index if slides shrink (e.g. after a refetch)
+  useEffect(() => {
+    if (active >= slides.length && slides.length > 0) setActive(0);
+  }, [slides.length, active]);
+
+  const slide = slides[active];
+
+  // ── Loading state ───────────────────────────────────────────────────────
+  if (loading) {
+    return (
+      <section
+        className="relative w-full bg-[#0f0e0c] flex items-center justify-center"
+        style={{ height: "100dvh", minHeight: 640, fontFamily: "var(--font-syne)" }}
+      >
+        <style>{`
+          @keyframes heroSpinnerRotate {
+            from { transform: rotate(0deg); }
+            to   { transform: rotate(360deg); }
+          }
+        `}</style>
+        <div
+          className="w-10 h-10 rounded-full"
+          style={{
+            border: "2px solid rgba(255,255,255,0.15)",
+            borderTopColor: "#C9A84C",
+            animation: "heroSpinnerRotate 0.9s linear infinite",
+          }}
+        />
+      </section>
+    );
+  }
+
+  // ── Empty state (no active slides in DB yet) ────────────────────────────
+  if (!slide) {
+    return (
+      <section
+        className="relative w-full bg-[#0f0e0c] flex items-center justify-center"
+        style={{ height: "60dvh", minHeight: 400, fontFamily: "var(--font-syne)" }}
+      >
+        <p className="text-white/35 text-[13px] tracking-wide">
+          No hero slides have been published yet.
+        </p>
+      </section>
+    );
+  }
 
   return (
     <section
@@ -249,71 +283,75 @@ useEffect(() => {
           </div>
 
           {/* ── THUMBNAIL RAIL ───────────────────────────────────────────── */}
-          <div className="hidden md:flex flex-col items-center gap-1.5 self-center shrink-0 ml-4">
-            {SLIDES.map((slide, idx) => (
-              <button
-                key={slide.id}
-                ref={(el) => (thumbsRef.current[idx] = el)}
-                onClick={() => goTo(idx)}
-                aria-label={`View look ${idx + 1}`}
-                style={{ opacity: 0 }}
-                className={[
-                  "relative overflow-hidden shrink-0 transition-all duration-250 cursor-pointer",
-                  "w-[58px] h-[68px] lg:w-[66px] lg:h-[76px]",
-                  "focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A84C]",
-                  active === idx
-                    ? "ring-[1.5px] ring-[#C9A84C] ring-offset-[2px] ring-offset-[#0f0e0c] opacity-100 scale-[1.03]"
-                    : "opacity-40 hover:opacity-75 hover:scale-[1.02]",
-                ].join(" ")}
-              >
-                <Image
-                  src={slide.thumbSrc}
-                  alt={`Look ${idx + 1}`}
-                  fill
-                  className="object-cover object-top"
-                  sizes="80px"
-                />
-                {active === idx && (
-                  <div className="absolute inset-0 bg-[#C9A84C]/10" />
-                )}
-                <span
-                  className="absolute bottom-1 right-1 text-[8px] font-bold text-white/60 tabular-nums leading-none"
-                  style={{ fontFamily: "var(--font-syne)", textShadow: "0 1px 3px rgba(0,0,0,0.8)" }}
+          {slides.length > 1 && (
+            <div className="hidden md:flex flex-col items-center gap-1.5 self-center shrink-0 ml-4">
+              {slides.map((s, idx) => (
+                <button
+                  key={s.id}
+                  ref={(el) => (thumbsRef.current[idx] = el)}
+                  onClick={() => goTo(idx)}
+                  aria-label={`View look ${idx + 1}`}
+                  style={{ opacity: 0 }}
+                  className={[
+                    "relative overflow-hidden shrink-0 transition-all duration-250 cursor-pointer",
+                    "w-[58px] h-[68px] lg:w-[66px] lg:h-[76px]",
+                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A84C]",
+                    active === idx
+                      ? "ring-[1.5px] ring-[#C9A84C] ring-offset-[2px] ring-offset-[#0f0e0c] opacity-100 scale-[1.03]"
+                      : "opacity-40 hover:opacity-75 hover:scale-[1.02]",
+                  ].join(" ")}
                 >
-                  {String(idx + 1).padStart(2, "0")}
-                </span>
-              </button>
-            ))}
+                  <Image
+                    src={s.thumbSrc}
+                    alt={`Look ${idx + 1}`}
+                    fill
+                    className="object-cover object-top"
+                    sizes="80px"
+                  />
+                  {active === idx && (
+                    <div className="absolute inset-0 bg-[#C9A84C]/10" />
+                  )}
+                  <span
+                    className="absolute bottom-1 right-1 text-[8px] font-bold text-white/60 tabular-nums leading-none"
+                    style={{ fontFamily: "var(--font-syne)", textShadow: "0 1px 3px rgba(0,0,0,0.8)" }}
+                  >
+                    {String(idx + 1).padStart(2, "0")}
+                  </span>
+                </button>
+              ))}
 
-            <div className="flex items-center gap-2 mt-1 pt-1.5 border-t border-white/[0.08] w-full justify-center">
-              <button
-                onClick={goPrev}
-                aria-label="Previous slide"
-                className="text-white/30 hover:text-[#C9A84C] transition-colors duration-200 p-0.5"
-              >
-                <ChevronLeft size={11} strokeWidth={2} />
-              </button>
-              <span className="text-[9px] text-white/35 tracking-widest tabular-nums" style={{ fontFamily: "var(--font-syne)" }}>
-                {String(active + 1).padStart(2, "0")} / {String(SLIDES.length).padStart(2, "0")}
-              </span>
-              <button
-                onClick={goNext}
-                aria-label="Next slide"
-                className="text-white/30 hover:text-[#C9A84C] transition-colors duration-200 p-0.5"
-              >
-                <ChevronRight size={11} strokeWidth={2} />
-              </button>
+              <div className="flex items-center gap-2 mt-1 pt-1.5 border-t border-white/[0.08] w-full justify-center">
+                <button
+                  onClick={goPrev}
+                  aria-label="Previous slide"
+                  className="text-white/30 hover:text-[#C9A84C] transition-colors duration-200 p-0.5"
+                >
+                  <ChevronLeft size={11} strokeWidth={2} />
+                </button>
+                <span className="text-[9px] text-white/35 tracking-widest tabular-nums" style={{ fontFamily: "var(--font-syne)" }}>
+                  {String(active + 1).padStart(2, "0")} / {String(slides.length).padStart(2, "0")}
+                </span>
+                <button
+                  onClick={goNext}
+                  aria-label="Next slide"
+                  className="text-white/30 hover:text-[#C9A84C] transition-colors duration-200 p-0.5"
+                >
+                  <ChevronRight size={11} strokeWidth={2} />
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Mobile dots */}
-          <div className="md:hidden absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5 z-30">
-            {SLIDES.map((_, idx) => (
-              <button key={idx} onClick={() => goTo(idx)} aria-label={`Slide ${idx + 1}`}
-                className={["rounded-full transition-all duration-300",
-                  active === idx ? "w-5 h-1.5 bg-[#C9A84C]" : "w-1.5 h-1.5 bg-white/30"].join(" ")} />
-            ))}
-          </div>
+          {slides.length > 1 && (
+            <div className="md:hidden absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-1.5 z-30">
+              {slides.map((_, idx) => (
+                <button key={idx} onClick={() => goTo(idx)} aria-label={`Slide ${idx + 1}`}
+                  className={["rounded-full transition-all duration-300",
+                    active === idx ? "w-5 h-1.5 bg-[#C9A84C]" : "w-1.5 h-1.5 bg-white/30"].join(" ")} />
+              ))}
+            </div>
+          )}
         </div>
       </div>
 

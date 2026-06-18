@@ -53,7 +53,7 @@ export default function ContactHero() {
       <div className="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-14 flex items-center justify-between gap-8 py-10 sm:py-14">
 
         {/* LEFT: text */}
-        <div ref={textRef} className="flex flex-col gap-4 max-w-[420px] z-10">
+        <div ref={textRef} className="flex flex-col gap-4 max-w-[420px] z-10 shrink-0">
           <h1
             className="text-white leading-none"
             style={{
@@ -85,14 +85,17 @@ export default function ContactHero() {
         <div
           ref={imageRef}
           className="hidden sm:block relative flex-shrink-0"
-          style={{ width: "clamp(280px, 42vw, 560px)", aspectRatio: "5/4" }}
+          style={{
+            width: "clamp(320px, 38vw, 480px)",
+            aspectRatio: "1 / 1",
+          }}
         >
           <Image
-            src="/images/telephone.png"
+            src="/images/tele.png"
             alt="Contact Nexora"
             fill
-            className="object-contain object-right-bottom"
-            sizes="(max-width: 1024px) 40vw, 560px"
+            className="object-contain object-center"
+            sizes="(max-width: 1024px) 45vw, 480px"
             priority
           />
         </div>

@@ -34,11 +34,11 @@ export default function UnisexProductCard({ product, isFav, onToggleFav }) {
     <>
       {/* ── CARD ── */}
       <div
-        className="group relative flex flex-col bg-[#111010] overflow-hidden cursor-pointer"
+        className="group relative flex flex-col bg-[#111010] overflow-hidden cursor-pointer rounded-xl"
         onClick={() => setModalOpen(true)}
       >
         {/* IMAGE */}
-        <div className="relative overflow-hidden bg-[#181614]" style={{ aspectRatio: "3/4" }}>
+        <div className="relative overflow-hidden bg-[#181614] rounded-t-xl" style={{ aspectRatio: "3/4" }}>
           <Image
             src={product.src}
             alt={product.name}
@@ -49,12 +49,12 @@ export default function UnisexProductCard({ product, isFav, onToggleFav }) {
 
           <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-350" />
 
-          {product.badge && (
+          {(product.badge || product.isNewArrival) && (
             <span
               className="absolute top-2.5 left-2.5 z-10 px-2 py-[3px] text-[#1a1000] text-[8px] font-bold tracking-[0.12em] uppercase leading-none"
               style={{ fontFamily: "var(--font-syne)", background: "#C9A84C", borderRadius: "2px" }}
             >
-              {product.badge}
+              {product.badge || "New"}
             </span>
           )}
 
@@ -95,7 +95,7 @@ export default function UnisexProductCard({ product, isFav, onToggleFav }) {
             {product.name}
           </p>
           <p className="text-white/55 text-[11px]" style={{ fontFamily: "var(--font-syne)" }}>
-            ${product.price}.00
+            ${(Number(product.price) / 100).toFixed(2)}
           </p>
         </div>
       </div>

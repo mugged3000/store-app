@@ -5,11 +5,13 @@ import Sidebar         from "@/adminmenu/page";
 import DashboardPage   from "@/dashboard/Dashboardpage";
 import ProductListPage from "@/dashboard/Productlist";
 import OrdersPage      from "@/dashboard/Orderpage";
+import HeroSlidesPage  from "@/dashboard/heroslide";
 
 const PAGE_TITLES = {
   dashboard: "Dashboard Overview",
   products:  "Product List",
   orders:    "Orders List",
+  hero:      "Hero Slides",
 };
 
 export default function AdminDashboard() {
@@ -45,6 +47,7 @@ export default function AdminDashboard() {
           )}
           {activePage === "products" && <ProductListPage />}
           {activePage === "orders"   && <OrdersPage />}
+          {activePage === "hero"     && <HeroSlidesPage />}
         </div>
       </div>
     </div>

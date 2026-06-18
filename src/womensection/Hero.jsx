@@ -7,8 +7,8 @@ import { gsap } from "gsap";
 import { ArrowRight } from "lucide-react";
 
 // ── Replace with your real women's image paths ────────────────────────────────
-const HERO_IMG  = "/images/womenset1.png";
-const HERO_IMG2 = "/images/women-look1.png";
+// const HERO_IMG  = "/images/dd4.jpg";
+const HERO_IMG2 = "/images/t-babe1.png";
 
 const STATS = [
   { value: "240+", label: "Women's Styles" },
@@ -196,13 +196,13 @@ export default function WomenHero() {
     >
       {/* ── BACKGROUND IMAGE ──────────────────────────────────────────────── */}
       <div ref={bgRef} className="absolute inset-0 z-0" style={{ opacity: 0 }}>
-        <Image
+        {/* <Image
           src={HERO_IMG}
           alt="Women's Collection"
           fill priority
           className="object-cover object-[center_15%]"
           sizes="100vw"
-        />
+        /> */}
         <div className="absolute inset-0" style={{
           background: "linear-gradient(115deg, rgba(15,12,9,0.96) 0%, rgba(15,12,9,0.74) 38%, rgba(15,12,9,0.3) 65%, transparent 100%)",
         }} />

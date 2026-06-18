@@ -6,71 +6,42 @@ import Image from "next/image";
 import { gsap } from "gsap";
 import { X, Heart, ShoppingBag, Star } from "lucide-react";
 
-const THUMB_POOL = [
-  "/images/t-shirt1.png",
-  "/images/t-shirt2.png",
-  "/images/t-shirt3.png",
-  "/images/t-babe1.png",
-  "/images/t-babe2.png",
-  "/images/t-babe3.png",
-];
-
+// Always: [main image, ...extra images] — no random fallbacks
 function getThumbnails(product) {
   if (!product) return [];
-  const others = THUMB_POOL.filter((p) => p !== product.src);
-  const a = others[(product.id * 3) % others.length];
-  const b = others[(product.id * 3 + 1) % others.length];
-  return [product.src, a, b];
+  const extras = (product.images ?? []).filter((img) => img !== product.image);
+  return [product.image, ...extras];
 }
 
 export function MenQuickView({ product, onClose, isFav, onToggleFav }) {
   const overlayRef = useRef(null);
   const panelRef   = useRef(null);
-  const heartRef   = useRef(null);
 
-  const [activeThumb, setActiveThumb]     = useState(0);
-  const [added, setAdded]                 = useState(false);
-  const [portalTarget, setPortalTarget]   = useState(null);
+  const [activeThumb,   setActiveThumb]   = useState(0);
+  const [added,         setAdded]         = useState(false);
+  const [portalTarget,  setPortalTarget]  = useState(null);
 
-  // SSR-safe portal target
   useEffect(() => { setPortalTarget(document.body); }, []);
+
+  // Reset to main image (index 0) when product changes
+  useEffect(() => { setActiveThumb(0); }, [product?.id]);
 
   const thumbnails = getThumbnails(product);
 
-  // Reset thumb when product changes
-  const productId = product?.id ?? null;
-  useEffect(() => { setActiveThumb(0); }, [productId]);
-
-  // Lock body scroll
   useEffect(() => {
     if (!product) return;
     document.body.style.overflow = "hidden";
     return () => { document.body.style.overflow = ""; };
   }, [product]);
 
-  // Entrance animation — runs after portal mounts
   useEffect(() => {
     if (!product || !overlayRef.current) return;
-    gsap.fromTo(overlayRef.current,
-      { opacity: 0 },
-      { opacity: 1, duration: 0.22, ease: "power2.out" }
-    );
-    gsap.fromTo(panelRef.current,
-      { y: 32, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.32, ease: "power3.out" }
-    );
+    gsap.fromTo(overlayRef.current, { opacity: 0 }, { opacity: 1, duration: 0.22, ease: "power2.out" });
+    gsap.fromTo(panelRef.current,   { y: 32, opacity: 0 }, { y: 0, opacity: 1, duration: 0.32, ease: "power3.out" });
   }, [product, portalTarget]);
 
   const handleClose = () => {
     gsap.to(overlayRef.current, { opacity: 0, duration: 0.18, onComplete: onClose });
-  };
-
-  const handleFav = () => {
-    onToggleFav(product.id);
-    gsap.fromTo(heartRef.current,
-      { scale: 0.4, rotate: -15 },
-      { scale: 1,   rotate: 0,  duration: 0.45, ease: "back.out(3.5)" }
-    );
   };
 
   const handleAddToBag = () => {
@@ -81,19 +52,15 @@ export function MenQuickView({ product, onClose, isFav, onToggleFav }) {
 
   if (!product || !portalTarget) return null;
 
-  const starCount = Math.floor(product.rating);
+  const starCount = Math.floor(product.rating ?? 0);
 
   const modal = (
     <div
       ref={overlayRef}
       onClick={handleClose}
       style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 9999,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
+        position: "fixed", inset: 0, zIndex: 9999,
+        display: "flex", alignItems: "center", justifyContent: "center",
         background: "rgba(0,0,0,0.75)",
         backdropFilter: "blur(4px)",
         padding: "16px",
@@ -103,14 +70,9 @@ export function MenQuickView({ product, onClose, isFav, onToggleFav }) {
         ref={panelRef}
         onClick={(e) => e.stopPropagation()}
         style={{
-          position: "relative",
-          display: "flex",
-          width: "100%",
-          maxWidth: "860px",
-          maxHeight: "90vh",
-          background: "#111010",
-          overflow: "hidden",
-          borderRadius: "2px",
+          position: "relative", display: "flex",
+          width: "100%", maxWidth: "860px", maxHeight: "90vh",
+          background: "#111010", overflow: "hidden", borderRadius: "2px",
         }}
       >
         {/* Close */}
@@ -118,26 +80,19 @@ export function MenQuickView({ product, onClose, isFav, onToggleFav }) {
           onClick={handleClose}
           aria-label="Close"
           style={{
-            position: "absolute",
-            top: "14px",
-            right: "14px",
-            zIndex: 10,
-            width: "32px",
-            height: "32px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
+            position: "absolute", top: "14px", right: "14px", zIndex: 10,
+            width: "32px", height: "32px",
+            display: "flex", alignItems: "center", justifyContent: "center",
             background: "rgba(0,0,0,0.5)",
             border: "1px solid rgba(255,255,255,0.1)",
-            borderRadius: "50%",
-            cursor: "pointer",
+            borderRadius: "50%", cursor: "pointer",
             color: "rgba(255,255,255,0.7)",
           }}
         >
           <X size={14} strokeWidth={1.8} />
         </button>
 
-        {/* LEFT — image + thumbnail strip */}
+        {/* LEFT — image + thumbnails */}
         <div style={{ width: "50%", flexShrink: 0, background: "#181614", display: "flex", flexDirection: "column" }}>
           <div style={{ position: "relative", flex: 1, minHeight: 0, aspectRatio: "3/4" }}>
             <Image
@@ -150,126 +105,67 @@ export function MenQuickView({ product, onClose, isFav, onToggleFav }) {
               priority
             />
             {product.badge && (
-              <span
-                style={{
-                  position: "absolute",
-                  top: "12px",
-                  left: "12px",
-                  zIndex: 2,
-                  padding: "3px 8px",
-                  background: "#C9A84C",
-                  color: "#1a1000",
-                  fontSize: "8px",
-                  fontWeight: 700,
-                  letterSpacing: "0.14em",
-                  textTransform: "uppercase",
-                  borderRadius: "2px",
-                  fontFamily: "var(--font-syne)",
-                }}
-              >
+              <span style={{
+                position: "absolute", top: "12px", left: "12px", zIndex: 2,
+                padding: "3px 8px", background: "#C9A84C", color: "#1a1000",
+                fontSize: "8px", fontWeight: 700, letterSpacing: "0.14em",
+                textTransform: "uppercase", borderRadius: "2px",
+                fontFamily: "var(--font-syne)",
+              }}>
                 {product.badge}
               </span>
             )}
           </div>
 
           {/* Thumbnail strip */}
-          <div style={{ display: "flex", gap: "8px", padding: "12px", background: "#0e0d0b" }}>
-            {thumbnails.map((src, i) => (
-              <button
-                key={i}
-                onClick={() => setActiveThumb(i)}
-                aria-label={`View image ${i + 1}`}
-                style={{
-                  position: "relative",
-                  flex: 1,
-                  aspectRatio: "3/4",
-                  overflow: "hidden",
-                  border: "none",
-                  padding: 0,
-                  cursor: "pointer",
-                  outline: activeThumb === i ? "2px solid #C9A84C" : "2px solid transparent",
-                  outlineOffset: "2px",
-                }}
-              >
-                <Image
-                  src={src}
-                  alt={`${product.name} view ${i + 1}`}
-                  fill
-                  style={{ objectFit: "cover" }}
-                  sizes="90px"
-                />
-                {activeThumb !== i && (
-                  <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.45)" }} />
-                )}
-              </button>
-            ))}
-          </div>
+          {thumbnails.length > 1 && (
+            <div style={{ display: "flex", gap: "8px", padding: "12px", background: "#0e0d0b" }}>
+              {thumbnails.map((src, i) => (
+                <button
+                  key={i}
+                  onClick={() => setActiveThumb(i)}
+                  aria-label={`View image ${i + 1}`}
+                  style={{
+                    position: "relative", flex: 1, aspectRatio: "3/4",
+                    overflow: "hidden", border: "none", padding: 0, cursor: "pointer",
+                    outline: activeThumb === i ? "2px solid #C9A84C" : "2px solid transparent",
+                    outlineOffset: "2px",
+                  }}
+                >
+                  <Image
+                    src={src}
+                    alt={`${product.name} view ${i + 1}`}
+                    fill
+                    style={{ objectFit: "cover" }}
+                    sizes="90px"
+                  />
+                  {activeThumb !== i && (
+                    <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0.45)" }} />
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* RIGHT — info */}
-        <div
-          style={{
-            width: "50%",
-            display: "flex",
-            flexDirection: "column",
-            padding: "36px 32px 32px",
-            overflowY: "auto",
-          }}
-        >
-          {/* Name + wishlist */}
+        <div style={{
+          width: "50%", display: "flex", flexDirection: "column",
+          padding: "36px 32px 32px", overflowY: "auto",
+        }}>
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px", marginBottom: "8px" }}>
-            <h2
-              style={{
-                margin: 0,
-                fontSize: "24px",
-                fontWeight: 700,
-                color: "#fff",
-                lineHeight: 1.2,
-                fontFamily: "var(--font-syne)",
-              }}
-            >
+            <h2 style={{
+              margin: 0, fontSize: "24px", fontWeight: 700,
+              color: "#fff", lineHeight: 1.2, fontFamily: "var(--font-syne)",
+            }}>
               {product.name}
             </h2>
-            <button
-              ref={heartRef}
-              onClick={handleFav}
-              aria-label="Toggle wishlist"
-              style={{
-                flexShrink: 0,
-                marginTop: "2px",
-                width: "36px",
-                height: "36px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                background: "transparent",
-                border: "1px solid rgba(255,255,255,0.15)",
-                borderRadius: "50%",
-                cursor: "pointer",
-              }}
-            >
-              <Heart
-                size={15}
-                strokeWidth={1.8}
-                style={{ color: isFav ? "#e86060" : "rgba(255,255,255,0.5)", fill: isFav ? "#e86060" : "none" }}
-              />
-            </button>
           </div>
 
-          {/* Price */}
-          <p
-            style={{
-              margin: "0 0 16px",
-              fontSize: "22px",
-              fontWeight: 600,
-              color: "#C9A84C",
-              fontFamily: "var(--font-syne)",
-            }}
-          >
-            ${product.price}.00
+          <p style={{ margin: "0 0 16px", fontSize: "22px", fontWeight: 600, color: "#C9A84C", fontFamily: "var(--font-syne)" }}>
+           ${(product.price / 100).toFixed(2)}
           </p>
 
-          {/* Stars */}
           <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "24px" }}>
             <div style={{ display: "flex", gap: "3px" }}>
               {Array.from({ length: 5 }).map((_, i) => (
@@ -281,44 +177,22 @@ export function MenQuickView({ product, onClose, isFav, onToggleFav }) {
             </span>
           </div>
 
-          {/* Divider */}
           <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)", marginBottom: "24px" }} />
 
-          {/* Description */}
-          <p
-            style={{
-              margin: "0 0 32px",
-              fontSize: "13px",
-              lineHeight: 1.8,
-              color: "rgba(255,255,255,0.45)",
-              fontFamily: "var(--font-syne)",
-            }}
-          >
-            A women's essential crafted for effortless style. Refined silhouette, premium
-            fabric, and a versatile fit designed to be worn any way you choose.
+          <p style={{ margin: "0 0 32px", fontSize: "13px", lineHeight: 1.8, color: "rgba(255,255,255,0.45)", fontFamily: "var(--font-syne)" }}>
+            {product.description ?? "A women's essential crafted for effortless style. Refined silhouette, premium fabric, and a versatile fit designed to be worn any way you choose."}
           </p>
 
-          {/* CTA */}
           <button
             onClick={handleAddToBag}
             style={{
-              marginTop: "auto",
-              width: "100%",
-              padding: "14px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "8px",
-              fontSize: "11px",
-              fontWeight: 700,
-              letterSpacing: "0.14em",
-              textTransform: "uppercase",
-              fontFamily: "var(--font-syne)",
+              marginTop: "auto", width: "100%", padding: "14px",
+              display: "flex", alignItems: "center", justifyContent: "center", gap: "8px",
+              fontSize: "11px", fontWeight: 700, letterSpacing: "0.14em",
+              textTransform: "uppercase", fontFamily: "var(--font-syne)",
               background: added ? "#1f3320" : "white",
               color: added ? "#6db86d" : "#0a0a0a",
-              border: "none",
-              borderRadius: "2px",
-              cursor: "pointer",
+              border: "none", borderRadius: "2px", cursor: "pointer",
               transition: "background 0.3s, color 0.3s",
             }}
           >
@@ -326,16 +200,11 @@ export function MenQuickView({ product, onClose, isFav, onToggleFav }) {
             {added ? "Added to Cart!" : "Add to Cart"}
           </button>
 
-          <p
-            style={{
-              marginTop: "12px",
-              textAlign: "center",
-              fontSize: "10px",
-              color: "rgba(255,255,255,0.2)",
-              letterSpacing: "0.05em",
-              fontFamily: "var(--font-syne)",
-            }}
-          >
+          <p style={{
+            marginTop: "12px", textAlign: "center", fontSize: "10px",
+            color: "rgba(255,255,255,0.2)", letterSpacing: "0.05em",
+            fontFamily: "var(--font-syne)",
+          }}>
             Free shipping on orders over $120 · Easy returns
           </p>
         </div>

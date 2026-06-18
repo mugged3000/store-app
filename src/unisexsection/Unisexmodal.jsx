@@ -6,21 +6,13 @@ import Image from "next/image";
 import { gsap } from "gsap";
 import { X, Heart, ShoppingBag, Star } from "lucide-react";
 
-const THUMB_POOL = [
-  "/images/t-shirt1.png",
-  "/images/t-shirt2.png",
-  "/images/t-shirt3.png",
-  "/images/t-babe1.png",
-  "/images/t-babe2.png",
-  "/images/t-babe3.png",
-];
-
+// Real product gallery — falls back to a single-image array if `images` is missing/empty.
 function getThumbnails(product) {
   if (!product) return [];
-  const others = THUMB_POOL.filter((p) => p !== product.src);
-  const a = others[(product.id * 3) % others.length];
-  const b = others[(product.id * 3 + 1) % others.length];
-  return [product.src, a, b];
+  if (Array.isArray(product.images) && product.images.length > 0) {
+    return product.images;
+  }
+  return product.src ? [product.src] : [];
 }
 
 export function UnisexProductModal({ product, onClose, isFav, onToggleFav }) {
@@ -84,7 +76,7 @@ export function UnisexProductModal({ product, onClose, isFav, onToggleFav }) {
 
   if (!product || !portalTarget) return null;
 
-  const starCount = Math.floor(product.rating);
+  const starCount = Math.floor(product.rating ?? 0);
 
   const modal = (
     /* OVERLAY — portaled to body so it's never clipped by a parent */
@@ -275,25 +267,27 @@ export function UnisexProductModal({ product, onClose, isFav, onToggleFav }) {
               fontFamily: "var(--font-syne)",
             }}
           >
-            ${product.price}.00
+            ${(Number(product.price) / 100).toFixed(2)}
           </p>
 
           {/* Stars */}
-          <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "24px" }}>
-            <div style={{ display: "flex", gap: "3px" }}>
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Star
-                  key={i}
-                  size={12}
-                  strokeWidth={0}
-                  fill={i < starCount ? "#C9A84C" : "rgba(255,255,255,0.15)"}
-                />
-              ))}
+          {product.rating != null && (
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "24px" }}>
+              <div style={{ display: "flex", gap: "3px" }}>
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star
+                    key={i}
+                    size={12}
+                    strokeWidth={0}
+                    fill={i < starCount ? "#C9A84C" : "rgba(255,255,255,0.15)"}
+                  />
+                ))}
+              </div>
+              <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", fontFamily: "var(--font-syne)" }}>
+                {product.rating}{product.reviews != null ? ` · ${product.reviews} reviews` : ""}
+              </span>
             </div>
-            <span style={{ fontSize: "12px", color: "rgba(255,255,255,0.4)", fontFamily: "var(--font-syne)" }}>
-              {product.rating} · {product.reviews} reviews
-            </span>
-          </div>
+          )}
 
           {/* Divider */}
           <div style={{ borderTop: "1px solid rgba(255,255,255,0.07)", marginBottom: "24px" }} />
@@ -308,8 +302,7 @@ export function UnisexProductModal({ product, onClose, isFav, onToggleFav }) {
               fontFamily: "var(--font-syne)",
             }}
           >
-            A unisex essential built for everyday wear. Clean lines, premium fabric, and a
-            relaxed fit designed to be shared and styled by anyone.
+            {product.description || "A unisex essential built for everyday wear. Clean lines, premium fabric, and a relaxed fit designed to be shared and styled by anyone."}
           </p>
 
           {/* CTA */}

@@ -271,7 +271,7 @@ export default function Footer() {
             letterSpacing: "-0.04em",
           }}
         >
-          NEXORA
+         ROWAN
         </p>
       </div>
     </footer>

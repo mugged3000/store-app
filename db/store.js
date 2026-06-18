@@ -1,6 +1,6 @@
 // lib/prisma.js
 
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from './generated/index.js'; // generated Prisma Client
 
 const globalForPrisma = global;
 
@@ -21,3 +21,5 @@ prisma.$connect()
     console.error("❌ Error connecting to StoreDatabase:", err);
     process.exit(1);
   });
+
+  export default prisma;

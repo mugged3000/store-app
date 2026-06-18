@@ -5,7 +5,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { SlidersHorizontal, ChevronDown, ChevronLeft, ChevronRight, X } from "lucide-react";
 
-import { ALL_PRODUCTS, SORT_OPTIONS, PER_PAGE } from "@/mensection/mensdata";
+import { SORT_OPTIONS, PER_PAGE } from "@/mensection/mensdata";
 import ProductCard from "@/mensection/Mensproductcard";
 import MenFilterSidebar from "@/mensection/Mensfillter";
 
@@ -16,39 +16,66 @@ export default function MenProducts() {
   const headingRef = useRef(null);
   const gridRef    = useRef(null);
 
+  const [products,     setProducts]     = useState([]);
+  const [loading,      setLoading]      = useState(true);
+
   const [activeCategory, setActiveCategory] = useState("All");
   const [activeSizes,    setActiveSizes]    = useState([]);
   const [activeColors,   setActiveColors]   = useState([]);
-  const [priceRange,     setPriceRange]     = useState([0, 200]);
+ const [priceRange, setPriceRange] = useState([0, 200]);
   const [sortBy,         setSortBy]         = useState("Newest");
   const [currentPage,    setCurrentPage]    = useState(1);
-  const [favourites,     setFavourites]     = useState(new Set());
   const [mobileFilter,   setMobileFilter]   = useState(false);
 
-  const toggleFav = (id) =>
-    setFavourites((prev) => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
-    });
+  // FETCH from DB
+useEffect(() => {
+  const getProducts = async () => {
+    try {
+      const res = await fetch("/api/products?gender=men");
+      const data = await res.json();
+
+      console.log("API DATA:", data);
+
+      setProducts(data.products ?? []);
+    } catch (error) {
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  getProducts();
+}, []);
+
+  // const toggleFav = (id) =>
+  //   setFavourites((prev) => {
+  //     const next = new Set(prev);
+  //     next.has(id) ? next.delete(id) : next.add(id);
+  //     return next;
+  //   });
 
   const toggleSize  = (s) => setActiveSizes((p)  => p.includes(s) ? p.filter((x) => x !== s) : [...p, s]);
   const toggleColor = (c) => setActiveColors((p) => p.includes(c) ? p.filter((x) => x !== c) : [...p, c]);
 
   const filtered = useMemo(() => {
-    let list = [...ALL_PRODUCTS];
+    let list = [...products];
     if (activeCategory !== "All") list = list.filter((p) => p.category === activeCategory);
-    if (activeSizes.length)       list = list.filter((p) => activeSizes.some((s) => p.sizes.includes(s)));
-    if (activeColors.length)      list = list.filter((p) => activeColors.some((c) => p.colors.includes(c)));
-    list = list.filter((p) => p.price >= priceRange[0] && p.price <= priceRange[1]);
+    if (activeSizes.length)       list = list.filter((p) => activeSizes.some((s) => p.sizes?.includes(s)));
+    if (activeColors.length)      list = list.filter((p) => activeColors.some((c) => p.colors?.includes(c)));
+    list = list.filter((p) => p.price / 100 >= priceRange[0] && p.price / 100 <= priceRange[1]);
     if (sortBy === "Price: Low to High") list.sort((a, b) => a.price - b.price);
     if (sortBy === "Price: High to Low") list.sort((a, b) => b.price - a.price);
-    if (sortBy === "Most Popular")       list.sort((a, b) => b.reviews - a.reviews);
+    if (sortBy === "Most Popular")       list.sort((a, b) => (b.reviews ?? 0) - (a.reviews ?? 0));
     return list;
-  }, [activeCategory, activeSizes, activeColors, priceRange, sortBy]);
+  }, [products, activeCategory, activeSizes, activeColors, priceRange, sortBy]);
 
   const totalPages = Math.ceil(filtered.length / PER_PAGE);
   const paginated  = filtered.slice((currentPage - 1) * PER_PAGE, currentPage * PER_PAGE);
+
+  console.log("Products State:", products);
+console.log("Filtered:", filtered);
+console.log("Paginated:", paginated);
+
 
   const resetFilters = () => {
     setActiveCategory("All");
@@ -60,19 +87,19 @@ export default function MenProducts() {
 
   const hasFilters =
     activeCategory !== "All" ||
-    activeSizes.length > 0  ||
-    activeColors.length > 0 ||
-    priceRange[0] > 0       ||
+    activeSizes.length > 0   ||
+    activeColors.length > 0  ||
+    priceRange[0] > 0        ||
     priceRange[1] < 200;
 
   useEffect(() => {
-    if (!gridRef.current) return;
+    if (!gridRef.current || loading) return;
     gsap.fromTo(
       gridRef.current.children,
       { opacity: 0, y: 18 },
       { opacity: 1, y: 0, duration: 0.45, stagger: 0.055, ease: "power3.out" }
     );
-  }, [paginated]);
+  }, [paginated, loading]);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -106,7 +133,6 @@ export default function MenProducts() {
     >
       <div className="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-14">
 
-        {/* SECTION HEADER */}
         <div
           ref={headingRef}
           className="flex flex-wrap items-end justify-between gap-4 mb-8 sm:mb-10"
@@ -114,7 +140,7 @@ export default function MenProducts() {
         >
           <div>
             <p className="text-[#C9A84C] text-[10px] font-bold tracking-[0.25em] uppercase mb-2">
-              Women's
+              Men's
             </p>
             <h2
               className="text-white font-bold leading-none"
@@ -147,11 +173,7 @@ export default function MenProducts() {
                   <option key={o} value={o}>Sort by: {o}</option>
                 ))}
               </select>
-              <ChevronDown
-                size={12}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-white/35 pointer-events-none"
-                strokeWidth={2}
-              />
+              <ChevronDown size={12} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-white/35 pointer-events-none" strokeWidth={2} />
             </div>
 
             <span className="text-white/35 text-[11px] tracking-wide hidden sm:block">
@@ -160,10 +182,8 @@ export default function MenProducts() {
           </div>
         </div>
 
-        {/* MAIN GRID */}
         <div className="flex gap-8 lg:gap-10">
 
-          {/* Sidebar — desktop */}
           <div className="hidden lg:block w-[210px] xl:w-[230px] shrink-0 pt-1">
             <MenFilterSidebar {...sidebarProps} />
           </div>
@@ -200,14 +220,26 @@ export default function MenProducts() {
               </div>
             )}
 
-            {paginated.length > 0 ? (
+            {loading ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-3 gap-3 sm:gap-4">
+                {Array.from({ length: PER_PAGE }).map((_, i) => (
+                  <div key={i} className="flex flex-col bg-[#111010] overflow-hidden animate-pulse">
+                    <div className="aspect-[3/4] bg-white/[0.06]" />
+                    <div className="px-3 pt-3 pb-4 space-y-2">
+                      <div className="h-3 bg-white/[0.06] rounded w-3/4" />
+                      <div className="h-3 bg-white/[0.06] rounded w-1/3" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : paginated.length > 0 ? (
               <div ref={gridRef} className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-3 gap-3 sm:gap-4">
                 {paginated.map((product) => (
                   <ProductCard
                     key={product.id}
                     product={product}
-                    isFav={favourites.has(product.id)}
-                    onToggleFav={toggleFav}
+                    // isFav={favourites.has(product.id)}
+                    // onToggleFav={toggleFav}
                   />
                 ))}
               </div>
@@ -265,7 +297,6 @@ export default function MenProducts() {
         </div>
       </div>
 
-      {/* MOBILE FILTER DRAWER */}
       {mobileFilter && (
         <>
           <div

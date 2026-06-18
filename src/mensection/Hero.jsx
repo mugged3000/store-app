@@ -7,7 +7,7 @@ import { gsap } from "gsap";
 import { ArrowRight, ChevronDown } from "lucide-react";
 
 // 💡 Replace these with your real men's hero image paths in /public/images/
-const HERO_IMG  = "/images/menhero.png";   // main full-bleed photo
+const HERO_IMG  = "/images/dd4.jpg";   // main full-bleed photo
 
 const STATS = [
   { value: "180+", label: "Men's Styles" },

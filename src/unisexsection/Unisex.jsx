@@ -6,19 +6,61 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import UnisexHero        from "@/unisexsection/Unisexhero";
 import UnisexProductCard from "@/unisexsection/Unisexcard";
-import UnisexQuickView   from "@/unisexsection/Quickview";
+// import UnisexQuickView   from "@/unisexsection/Quickview";
 import UnisexBanner from "@/unisexsection/Banner";
-import { ALL_PRODUCTS }  from "@/unisexsection/Unisexdata";
 
 gsap.registerPlugin(ScrollTrigger);
+
+// Maps a DB Product record into the shape UnisexProductCard / UnisexProductModal expect.
+// DB stores the main image on `image` (singular) and a gallery on `images` (array) —
+// the card/modal were built around `product.src`, so we bridge that here without
+// touching their internals.
+function mapProduct(p) {
+  return {
+    ...p,
+    src: p.image,
+    images: p.images && p.images.length > 0 ? p.images : [p.image],
+  };
+}
 
 export default function UnisexProducts() {
   const sectionRef = useRef(null);
   const headingRef = useRef(null);
   const gridRef    = useRef(null);
 
+  const [products,     setProducts]     = useState([]);
+  const [loading,      setLoading]      = useState(true);
+  const [error,        setError]        = useState(null);
   const [modalProduct, setModalProduct] = useState(null);
   const [favourites,   setFavourites]   = useState(new Set());
+
+  // ── FETCH UNISEX PRODUCTS FROM DB ──────────────
+  useEffect(() => {
+    async function fetchProducts() {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const res = await fetch("/api/products?gender=shop", {
+          cache: "no-store",
+        });
+
+        if (!res.ok) throw new Error(`Failed to load products (${res.status})`);
+
+        const data = await res.json();
+        const list = Array.isArray(data) ? data : (data.products ?? []);
+
+        setProducts(list.map(mapProduct));
+      } catch (err) {
+        console.error("[UnisexProducts] fetch error:", err);
+        setError(err.message || "Something went wrong. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchProducts();
+  }, []);
 
   const toggleFav = (id) =>
     setFavourites((prev) => {
@@ -27,9 +69,9 @@ export default function UnisexProducts() {
       return next;
     });
 
-  // ── GRID ANIMATION ─────────────────────────
+  // ── GRID ANIMATION — runs once products are in ─────
   useEffect(() => {
-    if (!gridRef.current) return;
+    if (loading || products.length === 0 || !gridRef.current) return;
 
     const ctx = gsap.context(() => {
       gsap.fromTo(
@@ -51,7 +93,7 @@ export default function UnisexProducts() {
     }, gridRef);
 
     return () => ctx.revert();
-  }, []);
+  }, [loading, products]);
 
   // ── HEADING ANIMATION ─────────────────────
   useEffect(() => {
@@ -96,6 +138,20 @@ export default function UnisexProducts() {
             </p>
           </div>
 
+          {/* Error state */}
+          {error && (
+            <p className="text-white/40 text-[12px] tracking-wide mb-6">
+              {error}
+            </p>
+          )}
+
+          {/* Empty state */}
+          {!loading && !error && products.length === 0 && (
+            <p className="text-white/40 text-[12px] tracking-wide mb-6">
+              No products found yet.
+            </p>
+          )}
+
           {/* ✅ RESPONSIVE GRID */}
           <div
             ref={gridRef}
@@ -109,35 +165,48 @@ export default function UnisexProducts() {
               lg:grid-cols-4
             "
           >
-            {ALL_PRODUCTS.map((product) => (
-              <div key={product.id} data-card>
-                <UnisexProductCard
-                  product={product}
-                  onOpen={setModalProduct}
-                  isFav={favourites.has(product.id)}
-                  onToggleFav={toggleFav}
-                />
-              </div>
-            ))}
+            {loading &&
+              Array.from({ length: 8 }).map((_, i) => (
+                <div
+                  key={`skeleton-${i}`}
+                  className="flex flex-col bg-[#111010] overflow-hidden animate-pulse"
+                >
+                  <div className="aspect-[3/4] bg-[#1e1c1c]" />
+                  <div className="px-2.5 pt-2.5 pb-3 flex flex-col gap-2">
+                    <div className="h-3 w-3/4 bg-[#1e1c1c] rounded" />
+                    <div className="h-3 w-1/3 bg-[#1e1c1c] rounded" />
+                  </div>
+                </div>
+              ))}
+
+            {!loading &&
+              products.map((product) => (
+                <div key={product.id} data-card>
+                  <UnisexProductCard
+                    product={product}
+                    onOpen={setModalProduct}
+                    isFav={favourites.has(product.id)}
+                    onToggleFav={toggleFav}
+                  />
+                </div>
+              ))}
           </div>
 
         </div>
       </section>
-        
-              {/* 🔥 NEW PROFESSIONAL SECTION */}
+
+      {/* 🔥 NEW PROFESSIONAL SECTION */}
       <UnisexBanner />
 
-
-
       {/* ── QUICK VIEW MODAL ─────────── */}
-      {modalProduct && (
+      {/* {modalProduct && (
         <UnisexQuickView
           product={modalProduct}
           onClose={() => setModalProduct(null)}
           isFav={favourites.has(modalProduct.id)}
           onToggleFav={() => toggleFav(modalProduct.id)}
         />
-      )}
+      )} */}
     </div>
   );
 }

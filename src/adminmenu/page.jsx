@@ -13,6 +13,8 @@ import {
   User,
   Menu,
   X,
+  ImageIcon,
+  MessageSquare,
 } from "lucide-react";
 
 const NAV_ITEMS = [
@@ -24,8 +26,15 @@ const NAV_ITEMS = [
   },
 
   {
+    key: "hero",
+    label: "Hero Slides",
+    href: "/admin/heroslides",
+    icon: ImageIcon,
+  },
+
+  {
     key: "products",
-    label: "Product List",
+    label: "Products",
     href: "/admin/productlist",
     icon: List,
   },
@@ -35,6 +44,13 @@ const NAV_ITEMS = [
     label: "Orders",
     href: "/admin/orders",
     icon: ShoppingCart,
+  },
+
+  {
+    key: "contact",
+    label: "Contact",
+    href: "/admin/contact",
+    icon: MessageSquare,
   },
 ];
 

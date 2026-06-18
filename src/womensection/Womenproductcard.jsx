@@ -1,22 +1,14 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
-import { gsap } from "gsap";
-import { Heart, ShoppingBag, Star } from "lucide-react";
+import { ShoppingBag, Star } from "lucide-react";
 import { WomenQuickView } from "./Womenquickview";
 
 export default function ProductCard({ product, isFav, onToggleFav }) {
-  const heartRef = useRef(null);
-  const [added, setAdded]       = useState(false);
-  const [hovered, setHovered]   = useState(false);
+  const [added,     setAdded]     = useState(false);
+  const [hovered,   setHovered]   = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
-
-  const handleFav = (e) => {
-    e.stopPropagation();
-    onToggleFav(product.id);
-    gsap.fromTo(heartRef.current, { scale: 0.6 }, { scale: 1, duration: 0.4, ease: "back.out(3)" });
-  };
 
   const handleAddToBag = (e) => {
     e.stopPropagation();
@@ -27,14 +19,13 @@ export default function ProductCard({ product, isFav, onToggleFav }) {
 
   return (
     <>
-      <div
-        className="group relative flex flex-col bg-[#111010] overflow-hidden cursor-pointer"
+     <div
+        className="group relative flex flex-col bg-[#111010] overflow-hidden cursor-pointer rounded-xl"
         onClick={() => setModalOpen(true)}
       >
-        {/* Image */}
-        <div className="relative aspect-[3/4] overflow-hidden bg-[#181614]">
+          <div className="relative aspect-[3/4] overflow-hidden bg-[#181614] rounded-t-xl">
           <Image
-            src={product.src}
+            src={product.image}        // ← was product.src
             alt={product.name}
             fill
             className="object-cover object-center transition-transform duration-700 group-hover:scale-[1.04]"
@@ -42,7 +33,6 @@ export default function ProductCard({ product, isFav, onToggleFav }) {
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-          {/* Badge */}
           {product.badge && (
             <span
               className="absolute top-3 left-3 z-10 px-2 py-1 text-[#1a1000] text-[8.5px] font-bold tracking-[0.12em] uppercase bg-[#C9A84C] leading-none"
@@ -52,21 +42,6 @@ export default function ProductCard({ product, isFav, onToggleFav }) {
             </span>
           )}
 
-          {/* Wishlist */}
-          <button
-            ref={heartRef}
-            onClick={handleFav}
-            aria-label="Wishlist"
-            className="absolute top-3 right-3 z-10 w-7 h-7 flex items-center justify-center rounded-full bg-black/45 backdrop-blur-sm border border-white/10 hover:bg-black/65 transition-colors"
-          >
-            <Heart
-              size={13}
-              strokeWidth={1.8}
-              className={`transition-colors duration-200 ${isFav ? "text-[#e86060] fill-[#e86060]" : "text-white/70"}`}
-            />
-          </button>
-
-          {/* Hover add-to-bag — no sizes */}
           <div className="absolute bottom-0 inset-x-0 z-10 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out">
             <button
               onClick={handleAddToBag}
@@ -85,7 +60,6 @@ export default function ProductCard({ product, isFav, onToggleFav }) {
           </div>
         </div>
 
-        {/* Info */}
         <div className="px-3 pt-3 pb-4">
           <p
             className="text-white text-[12.5px] font-semibold tracking-[0.03em] leading-tight mb-1"
@@ -95,7 +69,7 @@ export default function ProductCard({ product, isFav, onToggleFav }) {
           </p>
           <div className="flex items-center justify-between">
             <p className="text-[#C9A84C] text-[12px] font-bold" style={{ fontFamily: "var(--font-syne)" }}>
-              ${product.price}.00
+              ${(product.price / 100).toFixed(2)}
             </p>
             <div className="flex items-center gap-0.5">
               <Star size={9} className="text-[#C9A84C] fill-[#C9A84C]" />
@@ -107,7 +81,6 @@ export default function ProductCard({ product, isFav, onToggleFav }) {
         </div>
       </div>
 
-      {/* Modal — portaled to body */}
       {modalOpen && (
         <WomenQuickView
           product={product}
