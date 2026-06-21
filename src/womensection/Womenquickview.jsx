@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import { gsap } from "gsap";
 import { X, Heart, ShoppingBag, Star } from "lucide-react";
+import { useStore } from "@/context/StoreContext";
 
 // Always: [main image, ...extra images] — no random fallbacks
 function getThumbnails(product) {
@@ -13,13 +14,15 @@ function getThumbnails(product) {
   return [product.image, ...extras];
 }
 
-export function WomenQuickView({ product, onClose, isFav, onToggleFav }) {
+export function WomenQuickView({ product, onClose }) {
   const overlayRef = useRef(null);
   const panelRef   = useRef(null);
 
   const [activeThumb,   setActiveThumb]   = useState(0);
-  const [added,         setAdded]         = useState(false);
   const [portalTarget,  setPortalTarget]  = useState(null);
+
+  const { addToCart, inCart } = useStore();
+  const added = product ? inCart(product.id) : false;
 
   useEffect(() => { setPortalTarget(document.body); }, []);
 
@@ -46,8 +49,13 @@ export function WomenQuickView({ product, onClose, isFav, onToggleFav }) {
 
   const handleAddToBag = () => {
     if (added) return;
-    setAdded(true);
-    setTimeout(() => setAdded(false), 2500);
+    addToCart({
+      id:       product.id,
+      name:     product.name,
+      price:    product.price / 100,
+      image:    product.image,
+      category: "women",
+    });
   };
 
   if (!product || !portalTarget) return null;

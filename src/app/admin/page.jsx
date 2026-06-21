@@ -10,19 +10,33 @@ export default function AdminLoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = (e) => {
-    e.preventDefault();
+ const handleLogin = async (e) => {
+  e.preventDefault();
 
-    // Temporary admin login
-    if (
-      email === "admin@nexora.com" &&
-      password === "123456"
-    ) {
-      router.push("/admin/dashboard");
-    } else {
-      alert("Invalid admin credentials");
+  try {
+    const res = await fetch("/api/admin", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      alert(data.message);
+      return;
     }
-  };
+
+    router.push("/admin/dashboard");
+  } catch (error) {
+    alert("Something went wrong");
+  }
+};
 
   return (
     <div

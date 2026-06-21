@@ -108,24 +108,51 @@ export default function ContactMain() {
   const faqRef     = useRef(null);
   const mapRef     = useRef(null);
 
-  const [openFaq,   setOpenFaq]   = useState(null);
-  const [submitted, setSubmitted] = useState(false);
-  const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    subject: "",
-    message: "",
-  });
+ const [openFaq,   setOpenFaq]   = useState(null);
+const [submitted, setSubmitted] = useState(false);
+const [sending,   setSending]   = useState(false);
+const [error,     setError]     = useState(null);
+const [form, setForm] = useState({
+  firstName: "",
+  lastName: "",
+  email: "",
+  subject: "",
+  message: "",
+});
 
-  const handleChange = (e) =>
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+const handleChange = (e) =>
+  setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setSending(true);
+  setError(null);
+
+  try {
+    const res = await fetch("https://formspree.io/f/xkolwebr", {
+      method: "POST",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(form),
+    });
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => null);
+      throw new Error(data?.errors?.[0]?.message || "Failed to send message. Please try again.");
+    }
+
     setSubmitted(true);
+    setForm({ firstName: "", lastName: "", email: "", subject: "", message: "" });
     setTimeout(() => setSubmitted(false), 4000);
-  };
+  } catch (err) {
+    console.error("[ContactForm] submit error:", err);
+    setError(err.message || "Something went wrong. Please try again.");
+  } finally {
+    setSending(false);
+  }
+};
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -258,32 +285,39 @@ export default function ContactMain() {
                 onBlur={(e)  => (e.target.style.borderColor = "rgba(255,255,255,0.1)")}
               />
 
-              <button
-                type="submit"
-                style={{
-                  marginTop: "6px",
-                  width: "100%",
-                  padding: "15px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "8px",
-                  fontSize: "11px",
-                  fontWeight: 700,
-                  letterSpacing: "0.16em",
-                  textTransform: "uppercase",
-                  fontFamily: "var(--font-syne)",
-                  background: submitted ? "#1f3320" : "#C9A84C",
-                  color: submitted ? "#6db86d" : "#111111",
-                  border: "none",
-                  borderRadius: "3px",
-                  cursor: "pointer",
-                  transition: "background 0.3s, color 0.3s",
-                }}
-              >
-                <Send size={13} strokeWidth={2} />
-                {submitted ? "Message Sent!" : "Send Message"}
-              </button>
+            {error && (
+  <p style={{ color: "#e86060", fontSize: "12px", fontFamily: "var(--font-syne)", marginTop: "-2px" }}>
+    {error}
+  </p>
+)}
+
+<button
+  type="submit"
+  disabled={sending}
+  style={{
+    marginTop: "6px",
+    width: "100%",
+    padding: "15px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: "8px",
+    fontSize: "11px",
+    fontWeight: 700,
+    letterSpacing: "0.16em",
+    textTransform: "uppercase",
+    fontFamily: "var(--font-syne)",
+    background: submitted ? "#1f3320" : sending ? "rgba(201,168,76,0.5)" : "#C9A84C",
+    color: submitted ? "#6db86d" : "#111111",
+    border: "none",
+    borderRadius: "3px",
+    cursor: sending ? "not-allowed" : "pointer",
+    transition: "background 0.3s, color 0.3s",
+  }}
+>
+  <Send size={13} strokeWidth={2} />
+  {submitted ? "Message Sent!" : sending ? "Sending…" : "Send Message"}
+</button>
             </form>
           </div>
 

@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import Image from "next/image";
 import { gsap } from "gsap";
 import { X, Heart, ShoppingBag, Star } from "lucide-react";
+import { useStore } from "@/context/StoreContext";
 
 // Real product gallery — falls back to a single-image array if `images` is missing/empty.
 function getThumbnails(product) {
@@ -21,8 +22,10 @@ export function UnisexProductModal({ product, onClose, isFav, onToggleFav }) {
   const heartRef   = useRef(null);
 
   const [activeThumb, setActiveThumb] = useState(0);
-  const [added, setAdded]             = useState(false);
   const [portalTarget, setPortalTarget] = useState(null);
+
+  const { addToCart, inCart } = useStore();
+  const added = product ? inCart(product.id) : false;
 
   // Resolve portal target client-side only — avoids SSR mismatch
   useEffect(() => { setPortalTarget(document.body); }, []);
@@ -70,8 +73,13 @@ export function UnisexProductModal({ product, onClose, isFav, onToggleFav }) {
 
   const handleAddToBag = () => {
     if (added) return;
-    setAdded(true);
-    setTimeout(() => setAdded(false), 2500);
+    addToCart({
+      id:       product.id,
+      name:     product.name,
+      price:    Number(product.price) / 100,
+      image:    product.src ?? product.image,
+      category: "unisex",
+    });
   };
 
   if (!product || !portalTarget) return null;

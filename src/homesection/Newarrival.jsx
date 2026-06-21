@@ -6,15 +6,18 @@ import Link from "next/link";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Heart, ShoppingBag, ArrowRight, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { useStore } from "@/context/StoreContext";
 
 gsap.registerPlugin(ScrollTrigger);
 
 // ─── PRODUCT MODAL ─────────────────────────────────────────────────────────────
 function ProductModal({ product, onClose, isFav, onToggleFav }) {
   const [activeThumb, setActiveThumb] = useState(0);
-  const [addedToCart, setAddedToCart] = useState(false);
   const overlayRef = useRef(null);
   const modalRef   = useRef(null);
+
+  const { addToCart, inCart } = useStore();
+  const addedToCart = inCart(product.id);
 
   useEffect(() => {
     gsap.fromTo(overlayRef.current,
@@ -37,8 +40,13 @@ function ProductModal({ product, onClose, isFav, onToggleFav }) {
 
   const handleAddToCart = () => {
     if (addedToCart) return;
-    setAddedToCart(true);
-    setTimeout(() => setAddedToCart(false), 1800);
+    addToCart({
+      id:       product.id,
+      name:     product.name,
+      price:    Number(product.price) / 100,
+      image:    product.image,
+      category: "new-arrival",
+    });
   };
 
   return (
@@ -278,7 +286,8 @@ export default function NewArrivals() {
   const [canScrollLeft,  setCanScrollLeft]  = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
   const [modalProduct,   setModalProduct]   = useState(null);
-  const [favourites,     setFavourites]     = useState(new Set());
+
+  const { toggleFav: storeToggleFav, isFav } = useStore();
 
   // ── Fetch products from your API route ──────────────────────────────────────
   useEffect(() => {
@@ -309,10 +318,14 @@ export default function NewArrivals() {
   }, []);
 
   const toggleFav = (id) => {
-    setFavourites((prev) => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
+    const product = products.find((p) => p.id === id) || modalProduct;
+    if (!product) return;
+    storeToggleFav({
+      id:       product.id,
+      name:     product.name,
+      price:    Number(product.price) / 100,
+      image:    product.image,
+      category: "new-arrival",
     });
   };
 
@@ -473,7 +486,7 @@ export default function NewArrivals() {
                 product={product}
                 index={idx}
                 onOpenModal={setModalProduct}
-                isFav={favourites.has(product.id)}
+                isFav={isFav(product.id)}
                 onToggleFav={toggleFav}
               />
             </div>
@@ -497,7 +510,7 @@ export default function NewArrivals() {
         <ProductModal
           product={modalProduct}
           onClose={() => setModalProduct(null)}
-          isFav={favourites.has(modalProduct.id)}
+          isFav={isFav(modalProduct.id)}
           onToggleFav={() => toggleFav(modalProduct.id)}
         />
       )}

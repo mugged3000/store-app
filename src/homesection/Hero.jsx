@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { gsap } from "gsap";
 import { Star, ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -189,10 +190,10 @@ export default function HeroSection() {
   return (
     <section
       ref={sectionRef}
-      className="relative w-full bg-[#0f0e0c] overflow-hidden"
+      className="relative w-full max-w-[100vw] bg-[#0f0e0c] overflow-x-hidden"
       style={{ fontFamily: "var(--font-syne)" }}
     >
-      <div className="relative w-full h-[100dvh] min-h-[640px]">
+      <div className="relative w-full max-w-[100vw] h-[100dvh] min-h-[640px] overflow-hidden">
 
         {/* Ambient light ray */}
         <div
@@ -252,12 +253,16 @@ export default function HeroSection() {
             </p>
 
             <div className="flex flex-wrap gap-3 mb-8 sm:mb-10" style={{ opacity: 0 }}>
-              <button className="px-7 py-3 text-[10.5px] font-bold tracking-[0.15em] uppercase text-[#0f0e0c] bg-[#C9A84C] hover:bg-[#d4b85a] active:scale-[0.98] transition-all duration-200">
-                Shop New In
-              </button>
-              <button className="px-7 py-3 text-[10.5px] font-bold tracking-[0.15em] uppercase text-white border border-white/25 hover:border-white/55 hover:bg-white/5 active:scale-[0.98] transition-all duration-200">
-                Explore Collections
-              </button>
+              <Link href="/shop">
+                <button className="px-7 py-3 text-[10.5px] font-bold tracking-[0.15em] uppercase text-[#0f0e0c] bg-[#C9A84C] hover:bg-[#d4b85a] active:scale-[0.98] transition-all duration-200">
+                  Shop New In
+                </button>
+              </Link>
+              <Link href="/men">
+                <button className="px-7 py-3 text-[10.5px] font-bold tracking-[0.15em] uppercase text-white border border-white/25 hover:border-white/55 hover:bg-white/5 active:scale-[0.98] transition-all duration-200">
+                  Explore Collections
+                </button>
+              </Link>
             </div>
 
             <div className="flex items-center gap-4" style={{ opacity: 0 }}>
@@ -295,7 +300,7 @@ export default function HeroSection() {
                   className={[
                     "relative overflow-hidden shrink-0 transition-all duration-250 cursor-pointer",
                     "w-[58px] h-[68px] lg:w-[66px] lg:h-[76px]",
-                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A84C]",
+                    "focus:outline-none focus-visible:ring-2 focus-visible:ring-[#C9A84C] rounded-xl",
                     active === idx
                       ? "ring-[1.5px] ring-[#C9A84C] ring-offset-[2px] ring-offset-[#0f0e0c] opacity-100 scale-[1.03]"
                       : "opacity-40 hover:opacity-75 hover:scale-[1.02]",

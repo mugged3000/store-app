@@ -130,7 +130,7 @@ export default function ShopByCategory() {
                 src={cat.src}
                 alt={cat.label}
                 fill
-                className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+                className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105 rounded-xl"
                 sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
               />
 

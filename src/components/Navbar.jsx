@@ -5,6 +5,7 @@ import Link from "next/link";
 import { gsap } from "gsap";
 import { usePathname } from "next/navigation";
 import { Search, User, Heart, ShoppingBag, X, Menu, ChevronRight } from "lucide-react";
+import { useStore } from "@/context/StoreContext";
 
 const NAV_LINKS = [
 //   { label: "New In",      href: "/new-in",     badge: null,  sale: false },
@@ -28,7 +29,8 @@ export default function Navbar() {
   const [scrolled,   setScrolled]   = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [cartCount]                 = useState(2);
+
+  const { cartCount, favCount } = useStore();
 
 
   const pathname = usePathname();
@@ -138,12 +140,18 @@ export default function Navbar() {
               style={{ opacity: 0 }} className="hidden sm:flex text-white/60 hover:text-white transition-colors items-center">
               <User size={17} strokeWidth={1.8} />
             </button> */}
-            <button ref={(el) => (actionsRef.current[2] = el)} aria-label="Wishlist"
+            <Link href="/favourites" ref={(el) => (actionsRef.current[2] = el)} aria-label="Wishlist"
               onMouseEnter={(e) => pop(e.currentTarget)} onMouseLeave={(e) => unpop(e.currentTarget)}
-              style={{ opacity: 0 }} className="hidden sm:flex text-white/60 hover:text-white transition-colors items-center">
+              style={{ opacity: 0 }} className="hidden sm:flex relative text-white/60 hover:text-white transition-colors items-center">
               <Heart size={17} strokeWidth={1.8} />
-            </button>
-            <button ref={(el) => (actionsRef.current[3] = el)} aria-label="Cart"
+              {favCount > 0 && (
+                <span style={{ fontFamily: "var(--font-syne)" }}
+                  className="absolute -top-[6px] -right-[7px] w-[15px] h-[15px] rounded-full bg-[#C9A84C] text-[#1a1000] text-[7.5px] font-bold flex items-center justify-center leading-none">
+                  {favCount}
+                </span>
+              )}
+            </Link>
+            <Link href="/cart" ref={(el) => (actionsRef.current[3] = el)} aria-label="Cart"
               onMouseEnter={(e) => pop(e.currentTarget)} onMouseLeave={(e) => unpop(e.currentTarget)}
               style={{ opacity: 0 }} className="relative text-white/60 hover:text-white transition-colors flex items-center">
               <ShoppingBag size={17} strokeWidth={1.8} />
@@ -153,7 +161,7 @@ export default function Navbar() {
                   {cartCount}
                 </span>
               )}
-            </button>
+            </Link>
             <button aria-label="Menu" onClick={() => setMobileOpen((v) => !v)}
               className="lg:hidden text-white/70 hover:text-white transition-colors flex items-center ml-1">
               {mobileOpen ? <X size={19} strokeWidth={1.8} /> : <Menu size={19} strokeWidth={1.8} />}
@@ -211,9 +219,14 @@ export default function Navbar() {
           <button className="mob-item opacity-0 flex items-center gap-2.5 text-white/45 hover:text-white/85 transition-colors text-[11px] tracking-[0.1em] uppercase">
             <User size={14} strokeWidth={1.8} /> My Account
           </button>
-          <button className="mob-item opacity-0 flex items-center gap-2.5 text-white/45 hover:text-white/85 transition-colors text-[11px] tracking-[0.1em] uppercase">
-            <Heart size={14} strokeWidth={1.8} /> Wishlist
-          </button>
+          <Link href="/favourites" onClick={() => setMobileOpen(false)}
+            className="mob-item opacity-0 flex items-center gap-2.5 text-white/45 hover:text-white/85 transition-colors text-[11px] tracking-[0.1em] uppercase">
+            <Heart size={14} strokeWidth={1.8} /> Wishlist {favCount > 0 && `(${favCount})`}
+          </Link>
+          <Link href="/cart" onClick={() => setMobileOpen(false)}
+            className="mob-item opacity-0 flex items-center gap-2.5 text-white/45 hover:text-white/85 transition-colors text-[11px] tracking-[0.1em] uppercase">
+            <ShoppingBag size={14} strokeWidth={1.8} /> Cart {cartCount > 0 && `(${cartCount})`}
+          </Link>
         </div>
       </aside>
     </>

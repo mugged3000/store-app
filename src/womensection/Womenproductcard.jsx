@@ -4,17 +4,24 @@ import { useState } from "react";
 import Image from "next/image";
 import { ShoppingBag, Star } from "lucide-react";
 import { WomenQuickView } from "./Womenquickview";
+import { useStore } from "@/context/StoreContext";
 
-export default function ProductCard({ product, isFav, onToggleFav }) {
-  const [added,     setAdded]     = useState(false);
+export default function ProductCard({ product }) {
   const [hovered,   setHovered]   = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
 
+  const { addToCart, inCart } = useStore();
+  const added = inCart(product.id);
+
   const handleAddToBag = (e) => {
     e.stopPropagation();
-    if (added) return;
-    setAdded(true);
-    setTimeout(() => setAdded(false), 2000);
+    addToCart({
+      id:       product.id,
+      name:     product.name,
+      price:    product.price / 100,
+      image:    product.image,
+      category: "women",
+    });
   };
 
   return (
@@ -25,7 +32,7 @@ export default function ProductCard({ product, isFav, onToggleFav }) {
       >
           <div className="relative aspect-[3/4] overflow-hidden bg-[#181614] rounded-t-xl">
           <Image
-            src={product.image}        // ← was product.src
+            src={product.image}
             alt={product.name}
             fill
             className="object-cover object-center transition-transform duration-700 group-hover:scale-[1.04]"
@@ -55,7 +62,7 @@ export default function ProductCard({ product, isFav, onToggleFav }) {
               }}
             >
               <ShoppingBag size={11} strokeWidth={2} />
-              {added ? "Added!" : "Add to Cart"}
+              {added ? "In Cart ✓" : "Add to Cart"}
             </button>
           </div>
         </div>
@@ -85,8 +92,6 @@ export default function ProductCard({ product, isFav, onToggleFav }) {
         <WomenQuickView
           product={product}
           onClose={() => setModalOpen(false)}
-          isFav={isFav}
-          onToggleFav={onToggleFav}
         />
       )}
     </>

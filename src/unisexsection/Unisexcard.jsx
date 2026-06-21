@@ -5,13 +5,16 @@ import Image from "next/image";
 import { gsap } from "gsap";
 import { Heart, ShoppingBag } from "lucide-react";
 import { UnisexProductModal } from "@/unisexsection/Unisexmodal";
+import { useStore } from "@/context/StoreContext";
 
 export default function UnisexProductCard({ product, isFav, onToggleFav }) {
   const heartRef  = useRef(null);
   const addBtnRef = useRef(null);
 
   const [modalOpen, setModalOpen] = useState(false);
-  const [added, setAdded]         = useState(false);
+
+  const { addToCart, inCart } = useStore();
+  const added = inCart(product.id);
 
   const handleFav = (e) => {
     e.stopPropagation();
@@ -26,8 +29,13 @@ export default function UnisexProductCard({ product, isFav, onToggleFav }) {
   const handleAddToBag = (e) => {
     e.stopPropagation();
     if (added) return;
-    setAdded(true);
-    setTimeout(() => setAdded(false), 2000);
+    addToCart({
+      id:       product.id,
+      name:     product.name,
+      price:    Number(product.price) / 100,
+      image:    product.src,
+      category: "unisex",
+    });
   };
 
   return (
@@ -84,7 +92,7 @@ export default function UnisexProductCard({ product, isFav, onToggleFav }) {
               }}
             >
               <ShoppingBag size={10} strokeWidth={2} />
-              {added ? "Added!" : "Add to Bag"}
+              {added ? "In Cart ✓" : "Add to Bag"}
             </button>
           </div>
         </div>

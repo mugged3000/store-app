@@ -8,6 +8,7 @@ import UnisexHero        from "@/unisexsection/Unisexhero";
 import UnisexProductCard from "@/unisexsection/Unisexcard";
 // import UnisexQuickView   from "@/unisexsection/Quickview";
 import UnisexBanner from "@/unisexsection/Banner";
+import { useStore } from "@/context/StoreContext";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -32,7 +33,8 @@ export default function UnisexProducts() {
   const [loading,      setLoading]      = useState(true);
   const [error,        setError]        = useState(null);
   const [modalProduct, setModalProduct] = useState(null);
-  const [favourites,   setFavourites]   = useState(new Set());
+
+  const { toggleFav: storeToggleFav, isFav } = useStore();
 
   // ── FETCH UNISEX PRODUCTS FROM DB ──────────────
   useEffect(() => {
@@ -62,12 +64,17 @@ export default function UnisexProducts() {
     fetchProducts();
   }, []);
 
-  const toggleFav = (id) =>
-    setFavourites((prev) => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
+  const toggleFav = (id) => {
+    const product = products.find((p) => p.id === id) || modalProduct;
+    if (!product) return;
+    storeToggleFav({
+      id:       product.id,
+      name:     product.name,
+      price:    Number(product.price) / 100,
+      image:    product.src ?? product.image,
+      category: "unisex",
     });
+  };
 
   // ── GRID ANIMATION — runs once products are in ─────
   useEffect(() => {
@@ -185,7 +192,7 @@ export default function UnisexProducts() {
                   <UnisexProductCard
                     product={product}
                     onOpen={setModalProduct}
-                    isFav={favourites.has(product.id)}
+                    isFav={isFav(product.id)}
                     onToggleFav={toggleFav}
                   />
                 </div>
@@ -203,7 +210,7 @@ export default function UnisexProducts() {
         <UnisexQuickView
           product={modalProduct}
           onClose={() => setModalProduct(null)}
-          isFav={favourites.has(modalProduct.id)}
+          isFav={isFav(modalProduct.id)}
           onToggleFav={() => toggleFav(modalProduct.id)}
         />
       )} */}
