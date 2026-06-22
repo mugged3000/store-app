@@ -435,16 +435,14 @@ export default function NewArrivals() {
               </button>
             </div>
 
-            <Link
-              href="/new-in"
-              className="group hidden sm:flex items-center gap-2 text-white/45 hover:text-white transition-colors duration-200 text-[11px] font-semibold tracking-[0.12em] uppercase"
-            >
+            <Link href="/shop"
+              className="group hidden sm:flex items-center gap-2 text-white/45 hover:text-white transition-colors duration-200 text-[11px] font-semibold tracking-[0.12em] uppercase">
               View All New Arrivals
               <ArrowRight size={13} strokeWidth={2} className="group-hover:translate-x-1 transition-transform duration-200" />
             </Link>
           </div>
         </div>
-
+ 
         {/* Error state */}
         {error && (
           <div className="px-5 sm:px-8 lg:px-14 mb-6">

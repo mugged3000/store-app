@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { gsap } from "gsap";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Search, User, Heart, ShoppingBag, X, Menu, ChevronRight } from "lucide-react";
 import { useStore } from "@/context/StoreContext";
 
@@ -29,9 +29,10 @@ export default function Navbar() {
   const [scrolled,   setScrolled]   = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
+  const router = useRouter();
   const { cartCount, favCount } = useStore();
-
 
   const pathname = usePathname();
 
@@ -82,6 +83,15 @@ export default function Navbar() {
   const unpop = (el) => gsap.to(el, { scale: 1,    duration: 0.18, ease: "power2.out" });
   const lift  = (el) => gsap.to(el, { y: -2, duration: 0.14, ease: "power2.out" });
   const drop  = (el) => gsap.to(el, { y: 0,  duration: 0.18, ease: "power2.inOut" });
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const term = searchTerm.trim();
+    if (!term) return;
+    router.push(`/search?q=${encodeURIComponent(term)}`);
+    setSearchOpen(false);
+    setSearchTerm("");
+  };
 
   return (
     <>
@@ -142,7 +152,7 @@ export default function Navbar() {
             </button> */}
             <Link href="/favourites" ref={(el) => (actionsRef.current[2] = el)} aria-label="Wishlist"
               onMouseEnter={(e) => pop(e.currentTarget)} onMouseLeave={(e) => unpop(e.currentTarget)}
-              style={{ opacity: 0 }} className="hidden sm:flex relative text-white/60 hover:text-white transition-colors items-center">
+              style={{ opacity: 0 }} className="flex relative text-white/60 hover:text-white transition-colors items-center">
               <Heart size={17} strokeWidth={1.8} />
               {favCount > 0 && (
                 <span style={{ fontFamily: "var(--font-syne)" }}
@@ -173,16 +183,19 @@ export default function Navbar() {
         <div ref={searchBarRef} style={{ transformOrigin: "top center", opacity: 0, transform: "scaleY(0)" }}
           className="border-t border-white/[0.07] bg-[#0d0d0d]/98">
           <div className="max-w-[1440px] mx-auto px-5 sm:px-8 lg:px-12 py-3">
-            <div className="flex items-center gap-3 border border-white/[0.1] px-4 py-2.5 max-w-lg">
+            <form onSubmit={handleSearchSubmit}
+              className="flex items-center gap-3 border border-white/[0.1] px-4 py-2.5 max-w-lg">
               <Search size={13} className="text-white/30 shrink-0" strokeWidth={1.8} />
               <input ref={searchInputRef} type="text" placeholder="Search styles, collections…"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 style={{ fontFamily: "var(--font-syne)" }}
                 className="flex-1 bg-transparent text-white text-[12px] placeholder:text-white/25 outline-none tracking-wide" />
-              <button onClick={() => setSearchOpen(false)} style={{ fontFamily: "var(--font-syne)" }}
+              <button type="button" onClick={() => setSearchOpen(false)} style={{ fontFamily: "var(--font-syne)" }}
                 className="text-white/25 hover:text-white/55 transition-colors text-[9px] tracking-[0.14em] uppercase shrink-0">
                 ESC
               </button>
-            </div>
+            </form>
           </div>
         </div>
       </header>
@@ -195,7 +208,7 @@ export default function Navbar() {
       <aside ref={mobileMenuRef} style={{ transform: "translateX(100%)", fontFamily: "var(--font-syne)" }}
         className="fixed top-0 right-0 h-full w-[80vw] max-w-[320px] z-50 bg-[#0b0b0b] border-l border-white/[0.07] flex flex-col">
         <div className="flex items-center justify-between px-5 h-[56px] border-b border-white/[0.07] shrink-0">
-          <span className="text-white font-bold tracking-[0.2em] text-[13px] uppercase">NEXORA</span>
+          <span className="text-white font-bold tracking-[0.2em] text-[13px] uppercase">ROWAN STORE</span>
           <button onClick={() => setMobileOpen(false)} className="text-white/40 hover:text-white transition-colors">
             <X size={17} strokeWidth={1.8} />
           </button>

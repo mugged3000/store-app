@@ -7,14 +7,20 @@ import { Readable } from "stream";
 export async function GET(req) {
   const { searchParams } = new URL(req.url);
 
-  const type = searchParams.get("type");
+  const type   = searchParams.get("type");
   const gender = searchParams.get("gender");
+  const q      = searchParams.get("q"); // ?q=searchterm
 
   const products = await prisma.product.findMany({
     where: {
       ...(type === "new-arrivals" && { isNewArrival: true }),
       ...(gender && { gender }),
-      
+      ...(q && {
+        OR: [
+          { name:        { contains: q, mode: "insensitive" } },
+          { description: { contains: q, mode: "insensitive" } },
+        ],
+      }),
     },
     orderBy: {
       createdAt: "desc",
