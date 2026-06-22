@@ -165,10 +165,8 @@ export default function ShopByCategory() {
 
         {/* Mobile CTA */}
         <div className="mt-6 sm:hidden flex justify-center">
-          <Link
-            href="/categories"
-            className="flex items-center gap-2 text-white/45 hover:text-white transition-colors text-[11px] font-semibold tracking-[0.14em] uppercase"
-          >
+          <Link  href="/shop"
+            className="flex items-center gap-2 text-white/45 hover:text-white transition-colors text-[11px] font-semibold tracking-[0.14em] uppercase">
             View All Categories
             <ArrowRight size={12} strokeWidth={2} />
           </Link>
