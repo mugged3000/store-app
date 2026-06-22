@@ -18,8 +18,8 @@ const playfair = Playfair_Display({
 });
 
 export const metadata = {
-  title: "Nexora Store",
-  description: "Unisex fashion store",
+  title: "Rowan-Store",
+  description: "fashion store",
 };
 
 export default function RootLayout({ children }) {
