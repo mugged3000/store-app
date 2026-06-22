@@ -107,7 +107,7 @@ export default function Footer() {
               className="inline-block text-white font-bold tracking-[0.22em] text-[15px] uppercase mb-4 leading-none hover:text-[#C9A84C] transition-colors duration-200"
               style={{ fontFamily: "var(--font-syne)" }}
             >
-              NEXORA
+             ROWAN
             </Link>
             <p className="text-white/32 text-[12.5px] leading-[1.78] font-light">
               Elevated essentials. Timeless fits.<br />Crafted for comfort, designed for everyone.
@@ -231,7 +231,7 @@ export default function Footer() {
           className="flex flex-col sm:flex-row items-center justify-between gap-4 flex-wrap"
         >
           <p className="text-white/22 text-[11px] tracking-wide order-last sm:order-first" style={{ opacity: 0 }}>
-            © {new Date().getFullYear()} Nexora. All rights reserved.
+            © {new Date().getFullYear()} ROWAN. All rights reserved.
           </p>
 
           <div className="flex items-center gap-4 flex-wrap justify-center" style={{ opacity: 0 }}>
