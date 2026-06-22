@@ -103,7 +103,7 @@ export default function ShopByCategory() {
             </h2>
           </div>
           <Link
-            href="/categories"
+            href="/shop"
             className="group hidden sm:flex items-center gap-2 text-white/45 hover:text-white transition-colors duration-200 text-[11px] font-semibold tracking-[0.12em] uppercase shrink-0 pb-1"
           >
             View All Categories
