@@ -61,11 +61,18 @@ A modern full-stack e-commerce platform built with Next.js that delivers a fast,
 ## 📁 Folder Structure
 
 ```text
-ecommerce/
-├── public/
+## 📁 Folder Structure
+
+```text
+my-store/
+├── .next
 ├── prisma/
+├── db/
+├── public/
 ├── src/
 │   ├── app/
+│   │   ├── api/
+│   │   └── ...
 │   ├── actions/
 │   ├── components/
 │   ├── context/
@@ -81,6 +88,8 @@ ecommerce/
 ├── postcss.config.js
 ├── eslint.config.mjs
 └── README.md
+```
+
 ```
 
 ---
