@@ -178,7 +178,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\HP 840-G3\\Documents\\fullstack-shop\\my-store\\db\\generated",
+      "value": "C:\\Users\\HP 840-G3\\Documents\\Workspace\\fullstack-shop\\my-store\\db\\generated",
       "fromEnvVar": null
     },
     "config": {
@@ -196,7 +196,7 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\HP 840-G3\\Documents\\fullstack-shop\\my-store\\db\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\HP 840-G3\\Documents\\Workspace\\fullstack-shop\\my-store\\db\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
